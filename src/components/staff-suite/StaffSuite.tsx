@@ -7,12 +7,10 @@ import {
 } from '../../lib/supabase';
 import StaffSuiteLayout from './StaffSuiteLayout';
 import StaffDashboard from './screens/StaffDashboard';
-
-// Placeholder screen components for the next iteration
-const StaffAttendance = () => <div className="p-4 bg-slate-800/50 rounded-2xl border border-slate-700">Attendance History coming soon...</div>;
-const StaffLeave = () => <div className="p-4 bg-slate-800/50 rounded-2xl border border-slate-700">Leave Management coming soon...</div>;
-const StaffSalary = () => <div className="p-4 bg-slate-800/50 rounded-2xl border border-slate-700">Salary Breakdown coming soon...</div>;
-const StaffProfile = () => <div className="p-4 bg-slate-800/50 rounded-2xl border border-slate-700">Profile Settings coming soon...</div>;
+import StaffAttendance from './screens/StaffAttendance';
+import StaffLeave from './screens/StaffLeave';
+import StaffSalary from './screens/StaffSalary';
+import StaffProfile from './screens/StaffProfile';
 
 type StaffSuiteTab = 'home' | 'attendance' | 'leave' | 'salary' | 'profile';
 
@@ -102,10 +100,10 @@ export default function StaffSuite() {
                         onNavigate={(tab) => setActiveTab(tab as StaffSuiteTab)}
                     />
                 );
-            case 'attendance': return <StaffAttendance />;
-            case 'leave': return <StaffLeave />;
-            case 'salary': return <StaffSalary />;
-            case 'profile': return <StaffProfile />;
+            case 'attendance': return <StaffAttendance staff={staff} />;
+            case 'leave': return <StaffLeave staff={staff} />;
+            case 'salary': return <StaffSalary staff={staff} />;
+            case 'profile': return <StaffProfile staff={staff} />;
             default: return <StaffDashboard staff={staff} todayAttendance={todayAttendance} leaveBalance={leaveBalances} onNavigate={(tab) => setActiveTab(tab as StaffSuiteTab)} />;
         }
     };

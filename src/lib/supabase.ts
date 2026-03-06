@@ -3214,63 +3214,18 @@ export async function getEffectiveShift(staffId: string, date: string) {
     return data?.[0] as { shift_group_id: string; source: ShiftSource; assignment_id: string } | null;
 }
 
-export async function fetchAttendanceRecords(date: string, shiftGroupId?: string) {
-    // 1. Fetch Computed Summaries
-    let summaryQuery = supabase
-        .from('attendance_summaries')
-        .select(`
-            *,
-            staff:staff_master(
-                *,
-                shift_group:shift_groups(*)
-            ),
-            incident:attendance_incidents(*)
-        `)
-        .eq('attendance_date', date);
-
-    if (shiftGroupId) {
-        summaryQuery = summaryQuery.eq('staff.shift_group_id', shiftGroupId);
-    }
-
-    const { data: summariesData, error: sumError } = await summaryQuery;
-    if (sumError) throw sumError;
-
-    // 2. Fetch Manual Overrides/Raw Inputs from attendance_records
+export async function fetchAttendanceRecords(date: string) {
     const { data: recordsData, error: recError } = await supabase
         .from('attendance_records')
         .select('*')
         .eq('attendance_date', date);
     if (recError) throw recError;
-
-    // 3. Zip them together based on staff_id
-    // Treating `attendance_records` as the "editable punches" layer 
-    // and `attendance_summaries` as the "computed logic" layer.
-    const mergedData = (summariesData || []).map(sum => {
-        const record = recordsData?.find(r => r.staff_id === sum.staff_id);
-
-        return {
-            ...sum,
-            ...record,
-            id: sum.id, // Summary ID for UI tracking
-
-            // The "Effective" Punches (Override or Raw)
-            punch_in: record?.punch_in || sum.raw_punch_in,
-            punch_out: record?.punch_out || sum.raw_punch_out,
-
-            // Audio/Audit Baselines
-            raw_punch_in: sum.raw_punch_in,
-            raw_punch_out: sum.raw_punch_out,
-            override_punch_in: record?.punch_in,
-            override_punch_out: record?.punch_out,
-
-            correction_reason: record?.correction_reason,
-            is_verified: record?.is_verified || false,
-            notes: record?.notes || null
-        } as AttendanceRecord;
-    });
-
-    return mergedData;
+    return recordsData;
 }
+
+
+
+
 
 export async function upsertAttendanceRecords(records: Partial<AttendanceRecord>[]) {
     // Helper: ensure a value is a valid TIMESTAMPTZ string.
