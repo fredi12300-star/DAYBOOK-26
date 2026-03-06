@@ -92,7 +92,7 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
     const [drawerHistoryFrom, setDrawerHistoryFrom] = useState('');
     const [drawerHistoryTo, setDrawerHistoryTo] = useState('');
     const [penaltyMonth, setPenaltyMonth] = useState(new Date().toISOString().slice(0, 7));
-    const [penaltyWorkingDays, setPenaltyWorkingDays] = useState(26);
+    const [penaltyWorkingDays] = useState(26);
     const [previewMonthlyTracking, setPreviewMonthlyTracking] = useState<Record<string, number>>({});
     const [penaltyDays, setPenaltyDays] = useState<any[]>([]);
     const [penaltyLoading, setPenaltyLoading] = useState(false);
@@ -1387,14 +1387,9 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
                                                     </div>
                                                     <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800 space-y-1">
                                                         <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                                                            Work Days <Settings size={10} className="text-slate-600" />
+                                                            Work Days
                                                         </div>
-                                                        <input
-                                                            type="number" min={1} max={31}
-                                                            value={penaltyWorkingDays}
-                                                            onChange={e => setPenaltyWorkingDays(Math.max(1, parseInt(e.target.value) || 26))}
-                                                            className="bg-transparent text-sm font-black text-white w-full outline-none"
-                                                        />
+                                                        <div className="text-sm font-black text-white">{penaltyWorkingDays}</div>
                                                     </div>
                                                     <div className="col-span-2 p-4 bg-slate-900/50 rounded-2xl border border-slate-800 space-y-1">
                                                         <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Per-Day Rate</div>
