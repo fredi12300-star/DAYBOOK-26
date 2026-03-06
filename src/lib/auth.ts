@@ -4,13 +4,13 @@ import {
     UserProfile,
     UserOrgAccess,
     Role,
-    StaffProfile
+    StaffMaster
 } from '../types/accounting';
 
 interface AuthSession {
     user: any | null;
     profile: UserProfile | null;
-    staff: StaffProfile | null;
+    staff: StaffMaster | null;
     access: (UserOrgAccess & { role: Role })[];
     devicePermissions: Record<string, string[]> | null;
     isLoading: boolean;
@@ -37,9 +37,13 @@ export function useAuth() {
             // Fetch User Profile & Staff Info
             const { data: profile, error: profileError } = await supabase
                 .from('user_profiles')
-                .select('*, staff:staff_profiles(*)')
+                .select('*, staff:staff_master(*)')
                 .eq('id', user.id)
                 .maybeSingle();
+
+            console.log('DEBUG: User ID:', user.id);
+            console.log('DEBUG: Profile Data:', profile);
+            console.log('DEBUG: Profile Error:', profileError);
 
             if (profileError) {
                 console.error('Profile fetch error (non-fatal):', profileError);

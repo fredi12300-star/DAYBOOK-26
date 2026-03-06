@@ -1,11 +1,11 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Calendar, User, AlignLeft, RefreshCw, ZoomIn, Search } from 'lucide-react';
-import { fetchSystemAuditLogs, fetchStaffProfiles } from '../../lib/supabase';
-import { SystemAuditLog, StaffProfile } from '../../types/accounting';
+import { fetchSystemAuditLogs, fetchStaffMasters } from '../../lib/supabase';
+import { SystemAuditLog, StaffMaster } from '../../types/accounting';
 
 export default function AuditLogViewer() {
     const [logs, setLogs] = useState<SystemAuditLog[]>([]);
-    const [staff, setStaff] = useState<StaffProfile[]>([]);
+    const [staff, setStaff] = useState<StaffMaster[]>([]);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({
         staffId: '',
@@ -18,7 +18,7 @@ export default function AuditLogViewer() {
     useEffect(() => {
         const initData = async () => {
             try {
-                const s = await fetchStaffProfiles();
+                const s = await fetchStaffMasters();
                 setStaff(s);
             } catch (err) {
                 console.error("Failed to load filter lookups", err);

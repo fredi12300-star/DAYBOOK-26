@@ -19,10 +19,10 @@ import {
     Lock
 } from 'lucide-react';
 import {
-    AttendanceRecord, StaffProfile, ShiftGroup
+    AttendanceRecord, StaffMaster, ShiftGroup
 } from '../../types/accounting';
 import {
-    fetchAttendanceRecords, fetchStaffProfiles, fetchShiftGroups,
+    fetchAttendanceRecords, fetchStaffMasters, fetchShiftGroups,
     upsertAttendanceRecords, fetchDelayIncidents, fetchLeaveDaysForDate,
     fetchStaffAttendanceHistory, verifyDayRPC,
     resolveAttendanceIncidentRPC, fetchAttendanceCorrections,
@@ -57,7 +57,7 @@ export default function AttendanceManagement() {
     const [selectedShiftGroupId, setSelectedShiftGroupId] = useState<string>('all');
 
     // State
-    const [staff, setStaff] = useState<StaffProfile[]>([]);
+    const [staff, setStaff] = useState<StaffMaster[]>([]);
     const [shiftGroups, setShiftGroups] = useState<ShiftGroup[]>([]);
     const [records, setRecords] = useState<AttendanceRecord[]>([]);
     const [incidents, setIncidents] = useState<any[]>([]);
@@ -153,7 +153,7 @@ export default function AttendanceManagement() {
     async function loadData() {
         try {
             const [staffData, groupsData, incidentsData, correctionsData] = await Promise.all([
-                fetchStaffProfiles(),
+                fetchStaffMasters(),
                 fetchShiftGroups(),
                 selectedDate ? fetchDelayIncidents(selectedDate) : Promise.resolve([]),
                 selectedDate ? fetchAttendanceCorrections(selectedDate) : Promise.resolve([])
@@ -350,7 +350,7 @@ export default function AttendanceManagement() {
 
     const groupedStaff = useMemo(() => {
         const filtered = selectedShiftGroupId === 'all' ? staff : staff.filter(s => s.shift_group_id === selectedShiftGroupId);
-        const groups: Record<string, StaffProfile[]> = {};
+        const groups: Record<string, StaffMaster[]> = {};
         filtered.forEach(s => {
             const name = s.shift_group?.name || 'Unassigned';
             if (!groups[name]) groups[name] = [];

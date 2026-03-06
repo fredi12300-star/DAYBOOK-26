@@ -4,7 +4,7 @@ import {
     Template, TemplateGroup, Party, PartyGroup,
     TransactionSession, SessionFormData, UOM,
     FinancialYear, SystemConfiguration, SystemDateLog, BankStatus, ApprovalStatus, ReferencePrefix, BankTxnExport,
-    StaffProfile, Role, UserOrgAccess, ApprovalRequest, Device, DeviceDepartment,
+    StaffMaster, Role, UserOrgAccess, ApprovalRequest, Device, DeviceDepartment,
     AccountNature, Side, TrialBalanceRow,
     LeavePolicy, LeaveBalance, LeaveRequest,
     ExitPolicy, ExitCase, ExitChecklistTemplate, ExitChecklistItem, ExitClearanceTask, ExitFnfSettlement,
@@ -1521,7 +1521,7 @@ export async function clearAllData() {
         // Level 3: Policy, Staff & Template Details
         { name: 'template_lines' },
         { name: 'template_voucher_types', col: 'template_id' },
-        { name: 'staff_profiles' },
+        { name: 'staff_master' },
         { name: 'leave_requests' },
         { name: 'exit_cases' },
         { name: 'voucher_sequences', col: 'voucher_type_id' },
@@ -1840,10 +1840,10 @@ export async function seedSampleData() {
 // STAFF & IDENTITY OPERATIONS
 // ================================================================
 
-export async function fetchStaffProfiles(activeOnly = false) {
+export async function fetchStaffMasters(activeOnly = false) {
     return withRetry(async () => {
         let query = supabase
-            .from('staff_profiles')
+            .from('staff_master')
             .select('*, exit_cases(final_lwd, status)');
 
         if (activeOnly) {
@@ -1852,14 +1852,14 @@ export async function fetchStaffProfiles(activeOnly = false) {
 
         const { data, error } = await query.order('full_name');
         if (error) throw error;
-        return data as StaffProfile[];
+        return data as StaffMaster[];
     });
 }
 
-export async function upsertStaffProfile(staff: Partial<StaffProfile>) {
+export async function upsertStaffMaster(staff: Partial<StaffMaster>) {
     return withRetry(async () => {
         const { data, error } = await supabase
-            .from('staff_profiles')
+            .from('staff_master')
             .upsert(staff)
             .select()
             .single();
@@ -1874,20 +1874,20 @@ export async function upsertStaffProfile(staff: Partial<StaffProfile>) {
             }
         }
 
-        return data as StaffProfile;
+        return data as StaffMaster;
     });
 }
 
-export async function updateStaffProfile(id: string, staff: Partial<StaffProfile>) {
+export async function updateStaffMaster(id: string, staff: Partial<StaffMaster>) {
     return withRetry(async () => {
         const { data, error } = await supabase
-            .from('staff_profiles')
+            .from('staff_master')
             .update(staff)
             .eq('id', id)
             .select()
             .single();
         if (error) throw error;
-        return data as StaffProfile;
+        return data as StaffMaster;
     });
 }
 
@@ -1932,7 +1932,7 @@ export async function fetchPostingEligibleStaff() {
             .select('*')
             .order('full_name');
         if (error) throw error;
-        return data as (StaffProfile & { department_name?: string })[];
+        return data as (StaffMaster & { department_name?: string })[];
     });
 }
 
@@ -2621,7 +2621,7 @@ export async function fetchSystemAuditLogs(filters?: {
     const deviceSelector = `device:devices(${DEVICE_COLUMNS})`;
     let query = supabase
         .from('system_audit_logs')
-        .select(`*, staff_profile:staff_profiles(*), ${deviceSelector}`)
+        .select(`*, staff_profile:staff_master(*), ${deviceSelector}`)
         .order('created_at', { ascending: false });
 
     if (filters?.staffId) query = query.eq('staff_id', filters.staffId);
@@ -2827,7 +2827,7 @@ export async function fetchLeaveBalances(year: number) {
     return withRetry(async () => {
         const { data, error } = await supabase
             .from('leave_balances')
-            .select('*, staff:staff_profiles(*)')
+            .select('*, staff:staff_master(*)')
             .eq('year', year);
         if (error) throw error;
         return data as LeaveBalance[];
@@ -2838,7 +2838,7 @@ export async function fetchLeaveRequests(filters?: { staffId?: string, status?: 
     return withRetry(async () => {
         let query = supabase
             .from('leave_requests')
-            .select('*, staff:staff_profiles(*)')
+            .select('*, staff:staff_master(*)')
             .order('from_date', { ascending: false });
 
         if (filters?.staffId) query = query.eq('staff_id', filters.staffId);
@@ -2867,7 +2867,7 @@ export async function approveLeaveRequest(requestId: string, approverId: string)
         // 1. Get the request and the active policy
         const { data: request, error: reqError } = await supabase
             .from('leave_requests')
-            .select('*, staff:staff_profiles(*)')
+            .select('*, staff:staff_master(*)')
             .eq('id', requestId)
             .single();
         if (reqError) throw reqError;
@@ -2996,7 +2996,7 @@ export async function fetchExitCases() {
         .from('exit_cases')
         .select(`
             *,
-            staff:staff_profiles ! staff_id (id, full_name, staff_code, department)
+            staff:staff_master ! staff_id (id, full_name, staff_code, department)
         `)
         .order('created_at', { ascending: false });
     if (error) throw error;
@@ -3106,7 +3106,7 @@ export async function updateExitCaseStatus(caseId: string, status: ExitCase['sta
     // If case is MANAGER_APPROVED or CLOSED, deactivate the staff member and disconnect account
     if ((status === 'MANAGER_APPROVED' || status === 'CLOSED') && data?.staff_id) {
         const { error: sErr } = await supabase
-            .from('staff_profiles')
+            .from('staff_master')
             .update({ is_active: false })
             .eq('id', data.staff_id);
         if (sErr) throw sErr;
@@ -3300,7 +3300,7 @@ export async function verifyAttendanceRecord(recordId: string, userId: string) {
 }
 
 export async function fetchDelayIncidents(date?: string) {
-    let query = supabase.from('attendance_incidents').select('*, staff:staff_profiles(full_name, staff_code)');
+    let query = supabase.from('attendance_incidents').select('*, staff:staff_master(full_name, staff_code)');
     if (date) query = query.eq('attendance_date', date);
     const { data, error } = await query.order('created_at', { ascending: false });
     if (error) throw error;
@@ -3361,7 +3361,7 @@ export async function resolveAttendanceCorrectionRPC(params: {
 }
 
 export async function fetchAttendanceCorrections(date?: string) {
-    let query = supabase.from('attendance_corrections').select('*, staff:staff_profiles(full_name, staff_code)');
+    let query = supabase.from('attendance_corrections').select('*, staff:staff_master(full_name, staff_code)');
     if (date) query = query.eq('attendance_date', date);
     const { data, error } = await query.order('created_at', { ascending: false });
     if (error) throw error;
@@ -3370,7 +3370,7 @@ export async function fetchAttendanceCorrections(date?: string) {
 
 export async function fetchMonthlySnapshots(year: number, month: number, staffId?: string) {
     let query = supabase.from('attendance_monthly_snapshots')
-        .select('*, staff:staff_profiles(full_name, staff_code)')
+        .select('*, staff:staff_master(full_name, staff_code)')
         .eq('year', year)
         .eq('month', month);
 
@@ -3438,7 +3438,7 @@ export async function recordPayrollAdjustmentRPC(params: {
 
 export async function fetchDeltaAdjustments(year: number, month: number) {
     const { data, error } = await supabase.from('attendance_delta_adjustments')
-        .select('*, staff:staff_profiles(full_name, staff_code)')
+        .select('*, staff:staff_master(full_name, staff_code)')
         .eq('applied_in_year', year)
         .eq('applied_in_month', month);
     if (error) throw error;

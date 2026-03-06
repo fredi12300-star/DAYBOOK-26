@@ -8,11 +8,11 @@ import {
     Download,
     Eye
 } from 'lucide-react';
-import { StaffProfile } from '../../../types/accounting';
+import { StaffMaster } from '../../../types/accounting';
 import { supabase } from '../../../lib/supabase';
 
 interface StaffSalaryProps {
-    staff: StaffProfile;
+    staff: StaffMaster;
 }
 
 export default function StaffSalary({ staff }: StaffSalaryProps) {

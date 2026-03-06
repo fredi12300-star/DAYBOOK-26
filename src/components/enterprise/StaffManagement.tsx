@@ -6,18 +6,18 @@ import {
     FileText, Calendar, Info
 } from 'lucide-react';
 import {
-    fetchStaffProfiles, fetchRoles,
-    upsertStaffProfile, fetchUserOrgAccess, upsertUserOrgAccess, revokeUserOrgAccess,
+    fetchStaffMasters, fetchRoles,
+    upsertStaffMaster, fetchUserOrgAccess, upsertUserOrgAccess, revokeUserOrgAccess,
     provisionStaffAccount, fetchLatestExitCase, disconnectStaffAccount,
     fetchShiftGroups, fetchDeviceDepartments
 } from '../../lib/supabase';
 import { supabase } from '../../lib/supabase';
-import { StaffProfile, Role, UserOrgAccess, ExitCase, ShiftGroup, DeviceDepartment } from '../../types/accounting';
+import { StaffMaster, Role, UserOrgAccess, ExitCase, ShiftGroup, DeviceDepartment } from '../../types/accounting';
 import Modal from '../ui/Modal';
 
 const StaffManagement: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'staff' | 'roles' | 'history'>('staff');
-    const [staff, setStaff] = useState<StaffProfile[]>([]);
+    const [staff, setStaff] = useState<StaffMaster[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
     const [shiftGroups, setShiftGroups] = useState<ShiftGroup[]>([]);
     const [departments, setDepartments] = useState<DeviceDepartment[]>([]);
@@ -28,7 +28,7 @@ const StaffManagement: React.FC = () => {
     const [isStaffModalOpen, setIsStaffModalOpen] = useState(false);
     const [staffModalTab, setStaffModalTab] = useState<'IDENTITY' | 'EMPLOYMENT' | 'COMPLIANCE' | 'ACCOUNT' | 'RELIEVEMENT'>('IDENTITY');
     const [isRoleAssignmentModalOpen, setIsRoleAssignmentModalOpen] = useState(false);
-    const [editingStaff, setEditingStaff] = useState<StaffProfile | null>(null);
+    const [editingStaff, setEditingStaff] = useState<StaffMaster | null>(null);
     const [selectedRoleForAssignment, setSelectedRoleForAssignment] = useState<Role | null>(null);
     const [linkedUserId, setLinkedUserId] = useState<string | null>(null);
     const [loadingAccess, setLoadingAccess] = useState(false);
@@ -94,7 +94,7 @@ const StaffManagement: React.FC = () => {
         setLoading(true);
         try {
             const [staffData, rolesData, accessData, groupsData, deptsData] = await Promise.all([
-                fetchStaffProfiles(),
+                fetchStaffMasters(),
                 fetchRoles(),
                 fetchUserOrgAccess(),
                 fetchShiftGroups(),
@@ -159,7 +159,7 @@ const StaffManagement: React.FC = () => {
             return;
         }
 
-        const staffData: Partial<StaffProfile> = {
+        const staffData: Partial<StaffMaster> = {
             id: editingStaff?.id,
             staff_code: editingStaff?.staff_code || `EMP-${Math.floor(100000 + Math.random() * 900000)}`,
 
@@ -195,7 +195,7 @@ const StaffManagement: React.FC = () => {
         };
 
         try {
-            await upsertStaffProfile(staffData);
+            await upsertStaffMaster(staffData);
             setIsStaffModalOpen(false);
             setEditingStaff(null);
             setStaffModalTab('IDENTITY');
@@ -692,7 +692,7 @@ const StaffManagement: React.FC = () => {
                                 ].map(doc => (
                                     <label key={doc.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-800 cursor-pointer transition-colors">
                                         <span className="text-[11px] font-bold text-slate-300 tracking-tight">{doc.label}</span>
-                                        <input type="checkbox" name={doc.id} defaultChecked={editingStaff?.[doc.id as keyof StaffProfile] as boolean} className="w-5 h-5 rounded border border-slate-700 bg-slate-900 checked:bg-brand-500 checked:border-brand-500 transition-all appearance-none flex items-center justify-center before:content-[''] before:w-2.5 before:h-2.5 before:bg-white before:rounded-sm before:opacity-0 checked:before:opacity-100" />
+                                        <input type="checkbox" name={doc.id} defaultChecked={editingStaff?.[doc.id as keyof StaffMaster] as boolean} className="w-5 h-5 rounded border border-slate-700 bg-slate-900 checked:bg-brand-500 checked:border-brand-500 transition-all appearance-none flex items-center justify-center before:content-[''] before:w-2.5 before:h-2.5 before:bg-white before:rounded-sm before:opacity-0 checked:before:opacity-100" />
                                     </label>
                                 ))}
                             </div>

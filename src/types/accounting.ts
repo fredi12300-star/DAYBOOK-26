@@ -348,7 +348,7 @@ export interface SystemAuditLog {
     user_agent: string | null;
 
     // joined fields
-    staff_profile?: StaffProfile;
+    staff_profile?: StaffMaster;
     device?: Device;
 }
 
@@ -364,7 +364,7 @@ export interface FinancialYear {
 }
 
 // Phase 3: Enterprise Identity & Org
-export interface StaffProfile {
+export interface StaffMaster {
     id: string;
     staff_code: string;
     full_name: string;
@@ -441,7 +441,7 @@ export interface UserProfile {
     staff_id: string | null;
     is_super_admin: boolean;
     created_at: string;
-    staff?: StaffProfile;
+    staff?: StaffMaster;
 }
 
 // ================================================================
@@ -495,7 +495,7 @@ export interface AttendanceMonthlySnapshot {
     locked_by?: string;
     is_locked: boolean;
     checksum?: string;
-    staff?: StaffProfile;
+    staff?: StaffMaster;
 }
 
 export interface AttendancePayrollExport {
@@ -528,7 +528,7 @@ export interface AttendanceDeltaAdjustment {
     created_at: string;
     created_by?: string;
     processed_at?: string;
-    staff?: StaffProfile;
+    staff?: StaffMaster;
 }
 
 export interface PayrollReconciliation {
@@ -606,7 +606,7 @@ export interface AttendanceRecord {
     created_at?: string;
     updated_at?: string;
     // Joined / RPC Fields
-    staff?: StaffProfile;
+    staff?: StaffMaster;
     incident?: AttendanceIncident;
     correction?: AttendanceCorrection;
     conflict_flag?: boolean;
@@ -1005,7 +1005,7 @@ export interface LeaveBalance {
     incentive_status: 'ELIGIBLE' | 'HALF' | 'NOT_ELIGIBLE' | 'NOT_EVALUATED';
     updated_at: string;
     // Joined
-    staff?: StaffProfile;
+    staff?: StaffMaster;
 }
 
 export interface LeaveRequest {
@@ -1024,7 +1024,7 @@ export interface LeaveRequest {
     created_at?: string;
     updated_at?: string;
     // Joined
-    staff?: StaffProfile;
+    staff?: StaffMaster;
     days?: LeaveDay[];
 }
 
@@ -1114,7 +1114,7 @@ export interface ExitCase {
     updated_at?: string;
 
     // Joined
-    staff?: StaffProfile;
+    staff?: StaffMaster;
 }
 
 export interface ExitChecklistTemplate {
