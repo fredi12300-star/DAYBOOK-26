@@ -1228,23 +1228,20 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
 
             {/* Balance Detail Drawer */}
             {selectedBalance && (
-                <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[150] flex justify-end" onClick={() => setSelectedBalance(null)}>
-                    <div
-                        className="bg-[#0f172a] w-full max-w-sm h-full border-l border-slate-800 p-8 flex flex-col animate-in slide-in-from-right duration-300"
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <div className="flex items-center justify-between mb-8">
-                            <div>
-                                <h2 className="text-xl font-black text-white uppercase tracking-widest">Balance Details</h2>
-                                <p className="text-[9px] font-black text-brand-500 uppercase tracking-widest mt-1">Year {selectedBalance.year}</p>
-                            </div>
-                            <button onClick={() => setSelectedBalance(null)} className="p-2 bg-slate-800/50 rounded-xl text-slate-500 hover:text-white transition-colors">
-                                <X size={20} />
-                            </button>
+                <div className="fixed inset-0 z-[150] md:max-w-md md:mx-auto bg-[#0f172a] flex flex-col animate-in slide-in-from-bottom-4 duration-300">
+                    <div className="flex-shrink-0 px-6 py-5 border-b border-slate-800/50 flex items-center justify-between sticky top-0 bg-[#0f172a] shadow-sm z-10">
+                        <div>
+                            <h2 className="text-lg font-black text-white uppercase tracking-widest">Balance Details</h2>
+                            <p className="text-[9px] font-black text-brand-500 uppercase tracking-widest mt-1">Year {selectedBalance.year}</p>
                         </div>
+                        <button onClick={() => setSelectedBalance(null)} className="p-2 -mr-2 bg-slate-800/50 rounded-xl text-slate-500 hover:text-white transition-colors">
+                            <X size={20} />
+                        </button>
+                    </div>
 
+                    <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-6 pb-32">
                         {/* Balance Strip */}
-                        <div className="grid grid-cols-2 gap-3 mb-8">
+                        <div className="grid grid-cols-2 gap-3 mb-6">
                             <div className="p-4 bg-slate-900/50 rounded-3xl border border-slate-800">
                                 <p className="text-[8px] font-black text-slate-500 uppercase mb-1">Paid Rem.</p>
                                 <p className="text-xl font-black text-emerald-500">{selectedBalance.paid_balance}</p>
@@ -1256,7 +1253,7 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
                         </div>
 
                         {/* Drawer Tabs */}
-                        <div className="flex bg-slate-900/50 p-1.5 rounded-2xl border border-slate-800 mb-6">
+                        <div className="flex bg-slate-900/50 p-1.5 rounded-2xl border border-slate-800 mb-6 flex-shrink-0">
                             <button
                                 onClick={() => setDrawerTab('history')}
                                 className={`flex-1 py-3 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all ${drawerTab === 'history' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : 'text-slate-500'}`}
@@ -1271,23 +1268,20 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto custom-scrollbar pb-20 -mx-8">
+                        <div className="flex-1">
                             {drawerTab === 'history' ? (
-                                <div className="flex flex-col h-full">
-                                    <div className="flex flex-wrap items-center gap-3 px-8 py-4 border-b border-slate-800/50 bg-slate-900/30">
-                                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Filter</span>
+                                <div className="flex flex-col space-y-4">
+                                    <div className="flex flex-wrap items-center justify-between gap-3 p-4 border border-slate-800/50 bg-slate-900/30 rounded-2xl">
                                         <div className="flex items-center gap-2">
-                                            <input type="date" value={drawerHistoryFrom} onChange={e => setDrawerHistoryFrom(e.target.value)} className="bg-slate-900 border border-slate-800 text-white rounded-lg px-2 py-1 text-[10px] uppercase outline-none w-28" />
-                                        </div>
-                                        <span className="text-slate-500 font-bold">-</span>
-                                        <div className="flex items-center gap-2">
-                                            <input type="date" value={drawerHistoryTo} onChange={e => setDrawerHistoryTo(e.target.value)} className="bg-slate-900 border border-slate-800 text-white rounded-lg px-2 py-1 text-[10px] uppercase outline-none w-28" />
+                                            <input type="date" value={drawerHistoryFrom} onChange={e => setDrawerHistoryFrom(e.target.value)} className="bg-slate-900 border border-slate-800 text-white rounded-lg px-2 py-1.5 text-[10px] uppercase outline-none w-28" />
+                                            <span className="text-slate-500 font-bold">-</span>
+                                            <input type="date" value={drawerHistoryTo} onChange={e => setDrawerHistoryTo(e.target.value)} className="bg-slate-900 border border-slate-800 text-white rounded-lg px-2 py-1.5 text-[10px] uppercase outline-none w-28" />
                                         </div>
                                         {(drawerHistoryFrom || drawerHistoryTo) && (
                                             <button onClick={() => { setDrawerHistoryFrom(''); setDrawerHistoryTo(''); }} className="text-[10px] font-bold text-rose-400 hover:text-rose-300 uppercase tracking-widest px-3 py-1.5 border border-rose-500/20 rounded-lg bg-rose-500/5 transition-all">Clear</button>
                                         )}
                                     </div>
-                                    <div className="flex-1 overflow-y-auto w-full">
+                                    <div className="w-full border border-slate-800/50 rounded-2xl overflow-hidden bg-slate-900/20">
                                         {(() => {
                                             const filteredHistory = requests.filter(r => {
                                                 if (new Date(r.from_date).getFullYear() !== selectedBalance.year) return false;
@@ -1298,44 +1292,42 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
 
                                             if (filteredHistory.length === 0) {
                                                 return (
-                                                    <div className="flex flex-col items-center justify-center py-20 text-slate-600">
-                                                        <div className="text-[11px] font-black uppercase tracking-widest">No leave records found</div>
+                                                    <div className="flex flex-col items-center justify-center py-16 text-slate-600">
+                                                        <div className="text-[10px] font-black uppercase tracking-widest">No leave records found</div>
                                                     </div>
                                                 );
                                             }
 
                                             return (
-                                                <table className="w-full text-left">
-                                                    <thead className="sticky top-0 bg-[#0f172a] border-b border-slate-800 z-10">
-                                                        <tr>
-                                                            <th className="px-8 py-3 text-[9px] font-black text-slate-500 uppercase tracking-widest">Duration</th>
-                                                            <th className="px-4 py-3 text-[9px] font-black text-slate-500 uppercase tracking-widest">Days</th>
-                                                            <th className="px-4 py-3 text-[9px] font-black text-slate-500 uppercase tracking-widest">Type</th>
-                                                            <th className="px-4 py-3 text-[9px] font-black text-slate-500 uppercase tracking-widest">Status</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody className="divide-y divide-slate-800/40">
-                                                        {filteredHistory.map(r => (
-                                                            <tr key={r.id} className="hover:bg-white/[0.02] transition-colors">
-                                                                <td className="px-8 py-3.5 text-[11px] font-medium text-slate-300 whitespace-nowrap">
-                                                                    {new Date(r.from_date).toLocaleDateString('en-GB')}
-                                                                    {r.from_date !== r.to_date && <> &mdash; {new Date(r.to_date).toLocaleDateString('en-GB')}</>}
-                                                                </td>
-                                                                <td className="px-4 py-3.5">
-                                                                    <span className="px-2 py-0.5 bg-slate-800 rounded-md text-[10px] font-black text-white border border-slate-700">{r.days_count}</span>
-                                                                </td>
-                                                                <td className="px-4 py-3.5">
-                                                                    <span className={`text-[9px] font-black uppercase tracking-widest ${r.leave_type === 'PAID' ? 'text-emerald-500' : r.leave_type === 'UNPAID' ? 'text-amber-500' : 'text-rose-500'}`}>{r.leave_type}</span>
-                                                                </td>
-                                                                <td className="px-4 py-3.5 pr-8">
-                                                                    <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border ${getStatusStyles(r.status)}`}>
-                                                                        {r.status.replace('_', ' ')}
-                                                                    </span>
-                                                                </td>
+                                                <div className="w-full overflow-x-auto custom-scrollbar">
+                                                    <table className="w-full text-left min-w-[300px]">
+                                                        <thead className="bg-[#0f172a]/50 border-b border-slate-800/50">
+                                                            <tr>
+                                                                <th className="px-4 py-3 text-[9px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Duration</th>
+                                                                <th className="px-3 py-3 text-[9px] font-black text-slate-500 uppercase tracking-widest text-center whitespace-nowrap">Days</th>
+                                                                <th className="px-4 py-3 text-[9px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap text-right">Status</th>
                                                             </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
+                                                        </thead>
+                                                        <tbody className="divide-y divide-slate-800/40">
+                                                            {filteredHistory.map(r => (
+                                                                <tr key={r.id} className="hover:bg-white/[0.02] transition-colors">
+                                                                    <td className="px-4 py-3 text-[10px] font-medium text-slate-300">
+                                                                        <div className="whitespace-nowrap">{new Date(r.from_date).toLocaleDateString('en-GB')}</div>
+                                                                        {r.from_date !== r.to_date && <div className="whitespace-nowrap text-slate-500">{new Date(r.to_date).toLocaleDateString('en-GB')}</div>}
+                                                                    </td>
+                                                                    <td className="px-3 py-3 text-center">
+                                                                        <span className="px-2 py-0.5 bg-slate-800 rounded-md text-[10px] font-black text-white border border-slate-700 inline-block">{r.days_count}</span>
+                                                                    </td>
+                                                                    <td className="px-4 py-3 text-right">
+                                                                        <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border inline-block whitespace-nowrap ${getStatusStyles(r.status)}`}>
+                                                                            {r.status.replace('_', ' ')}
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             );
                                         })()}
                                     </div>
@@ -1369,7 +1361,7 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
                                 const monthLabel = new Date(pmYear, pmMonth - 1, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
 
                                 return (
-                                    <div className="flex-1 overflow-y-auto custom-scrollbar">
+                                    <div className="w-full">
                                         {penaltyLoading ? (
                                             <div className="flex items-center justify-center py-20">
                                                 <div className="spinner !w-7 !h-7 border-rose-500" />
