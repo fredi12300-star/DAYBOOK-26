@@ -928,7 +928,7 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
             {isApplying && (
                 <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[100] flex items-end md:items-center justify-center p-4" onClick={() => !isSubmitting && setIsApplying(false)}>
                     <div
-                        className="bg-[#0f172a] w-full max-w-sm rounded-[2.5rem] border border-slate-800 p-8 space-y-6 shadow-2xl animate-in slide-in-from-bottom-10 duration-300 overflow-y-auto max-h-[90vh]"
+                        className="bg-[#0f172a] w-full max-w-[calc(100vw-2rem)] md:max-w-sm rounded-[2.5rem] border border-slate-800 p-5 md:p-8 space-y-6 shadow-2xl animate-in slide-in-from-bottom-10 duration-300 overflow-x-hidden overflow-y-auto max-h-[90vh]"
                         onClick={e => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-2">
@@ -1040,7 +1040,7 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
                                         </div>
                                     ) : (
                                         <div className="space-y-4">
-                                            <div className="grid grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 <div className="space-y-1.5">
                                                     <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Start Date</label>
                                                     <input
@@ -1062,7 +1062,7 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="grid grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 <div className="space-y-1.5">
                                                     <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Start Day</label>
                                                     <select

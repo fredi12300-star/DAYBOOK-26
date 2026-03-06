@@ -45,7 +45,6 @@ export function ExitManagement() {
     const [cases, setCases] = useState<ExitCase[]>([]);
     const [policy, setPolicy] = useState<ExitPolicy | null>(null);
     const [staff, setStaff] = useState<StaffMaster[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
 
     // Checklist State
     const [templates, setTemplates] = useState<(ExitChecklistTemplate & { items: ExitChecklistItem[] })[]>([]);
@@ -80,7 +79,6 @@ export function ExitManagement() {
     }, [activeTab]);
 
     const loadData = async () => {
-        setIsLoading(true);
         try {
             if (activeTab === 'requests') {
                 const fetchedCases = await fetchExitCases();
@@ -104,8 +102,6 @@ export function ExitManagement() {
             }
         } catch (error) {
             console.error("Error loading exit records:", error);
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -301,442 +297,434 @@ export function ExitManagement() {
             </div>
 
             {/* Main Content Area */}
-            {isLoading ? (
-                <div className="flex justify-center p-12">
-                    <div className="w-8 h-8 rounded-full border-t-2 border-b-2 border-brand-500 animate-spin"></div>
-                </div>
-            ) : (
-                <div className="animate-fade-in shadow-xl bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden">
-                    {activeTab === 'requests' && (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-slate-950 border-b border-slate-800">
-                                        <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Case ID</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Employee</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Type</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">LWD</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Status</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Actions</th>
+            <div className="animate-fade-in shadow-xl bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden">
+                {activeTab === 'requests' && (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-slate-950 border-b border-slate-800">
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Case ID</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Employee</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Type</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">LWD</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Status</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {cases.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-8 text-center text-slate-500 text-sm">
+                                            No exit cases found.
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {cases.length === 0 ? (
-                                        <tr>
-                                            <td colSpan={6} className="px-6 py-8 text-center text-slate-500 text-sm">
-                                                No exit cases found.
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        cases.map(c => {
-                                            const noticePeriod = policy?.notice_period_days || 30;
-                                            const initiated = new Date(c.initiated_date);
-                                            const today = new Date();
-                                            // Diff in days
-                                            const diffTime = today.getTime() - initiated.getTime();
-                                            const diffDays = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
-                                            const daysServed = Math.min(diffDays, noticePeriod);
-                                            const isNoticeCompleted = diffDays >= noticePeriod || c.exit_type === 'TERMINATION';
+                                ) : (
+                                    cases.map(c => {
+                                        const noticePeriod = policy?.notice_period_days || 30;
+                                        const initiated = new Date(c.initiated_date);
+                                        const today = new Date();
+                                        // Diff in days
+                                        const diffTime = today.getTime() - initiated.getTime();
+                                        const diffDays = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+                                        const daysServed = Math.min(diffDays, noticePeriod);
+                                        const isNoticeCompleted = diffDays >= noticePeriod || c.exit_type === 'TERMINATION';
 
-                                            return (
-                                                <tr key={c.id} className="border-b border-slate-800/50 hover:bg-slate-800/20 transition-colors">
-                                                    <td className="px-6 py-4">
-                                                        <div className="text-xs font-mono text-slate-400">{c.id.split('-')[0]}</div>
-                                                        <div className="text-[10px] text-slate-500">{new Date(c.initiated_date).toLocaleDateString()}</div>
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <div className="text-sm font-bold text-white">{c.staff?.full_name}</div>
-                                                        <div className="text-[10px] text-slate-500">{c.staff?.staff_code}</div>
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <div className="text-xs font-bold text-slate-300">{c.exit_type}</div>
-                                                        {c.exit_type !== 'DEATH' && c.exit_type !== 'ABSCONDING' && c.exit_type !== 'TERMINATION' && c.status !== 'CLOSED' && (
-                                                            <div className="text-[10px] font-medium text-slate-500 mt-1">
-                                                                Notice: {daysServed}/{noticePeriod} days
-                                                            </div>
-                                                        )}
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <div className="text-xs font-bold text-brand-500">
-                                                            {c.final_lwd ? new Date(c.final_lwd).toLocaleDateString() : (c.proposed_lwd ? new Date(c.proposed_lwd).toLocaleDateString() + ' (Prop)' : 'TBD')}
+                                        return (
+                                            <tr key={c.id} className="border-b border-slate-800/50 hover:bg-slate-800/20 transition-colors">
+                                                <td className="px-6 py-4">
+                                                    <div className="text-xs font-mono text-slate-400">{c.id.split('-')[0]}</div>
+                                                    <div className="text-[10px] text-slate-500">{new Date(c.initiated_date).toLocaleDateString()}</div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="text-sm font-bold text-white">{c.staff?.full_name}</div>
+                                                    <div className="text-[10px] text-slate-500">{c.staff?.staff_code}</div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="text-xs font-bold text-slate-300">{c.exit_type}</div>
+                                                    {c.exit_type !== 'DEATH' && c.exit_type !== 'ABSCONDING' && c.exit_type !== 'TERMINATION' && c.status !== 'CLOSED' && (
+                                                        <div className="text-[10px] font-medium text-slate-500 mt-1">
+                                                            Notice: {daysServed}/{noticePeriod} days
                                                         </div>
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${c.status === 'CLOSED' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-                                                            c.status === 'INITIATED' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
-                                                                c.status === 'EXIT_SCHEDULED' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
-                                                                    'bg-purple-500/10 text-purple-500 border-purple-500/20'
-                                                            }`}>
-                                                            {c.status.replace(/_/g, ' ')}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-right">
-                                                        {isAdmin && c.status !== 'CLOSED' && (
-                                                            <button
-                                                                onClick={() => handleApproveStatus(c.id, c.status)}
-                                                                disabled={!isNoticeCompleted}
-                                                                title={!isNoticeCompleted ? "Notice period not yet completed" : "Move to next state"}
-                                                                className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 border rounded-lg transition-all ${isNoticeCompleted
-                                                                    ? "text-emerald-500 hover:text-emerald-400 border-emerald-500/20 bg-emerald-500/5"
-                                                                    : "text-slate-500 border-slate-700 bg-slate-800/50 cursor-not-allowed opacity-50"
-                                                                    }`}
-                                                            >
-                                                                Move Next
-                                                            </button>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            )
-                                        })
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-
-                    {activeTab === 'checklists' && (
-                        <div className="grid grid-cols-12 min-h-[500px]">
-                            {/* Templates Sidebar */}
-                            <div className="col-span-12 md:col-span-4 border-r border-slate-800 bg-slate-900/50 p-6 space-y-4">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Checklist Templates</h4>
-                                    <button
-                                        onClick={() => setIsCreatingTemplate(true)}
-                                        className="p-1 hover:bg-white/10 rounded transition-colors text-brand-500"
-                                    >
-                                        <Plus className="w-4 h-4" />
-                                    </button>
-                                </div>
-
-                                {isCreatingTemplate && (
-                                    <div className="p-3 bg-slate-800 rounded-xl border border-brand-500/20 space-y-2 animate-fade-in">
-                                        <input
-                                            autoFocus
-                                            type="text"
-                                            placeholder="Template Name..."
-                                            value={newTemplateName}
-                                            onChange={e => setNewTemplateName(e.target.value)}
-                                            className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
-                                            onKeyDown={e => e.key === 'Enter' && handleCreateTemplate()}
-                                        />
-                                        <div className="flex gap-2">
-                                            <button onClick={handleCreateTemplate} className="flex-1 bg-brand-500 text-white text-[10px] font-bold py-1.5 rounded-lg hover:bg-brand-400 transition-colors">Create</button>
-                                            <button onClick={() => setIsCreatingTemplate(false)} className="px-2 py-1.5 text-slate-400 hover:text-white text-[10px] font-bold">Cancel</button>
-                                        </div>
-                                    </div>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="text-xs font-bold text-brand-500">
+                                                        {c.final_lwd ? new Date(c.final_lwd).toLocaleDateString() : (c.proposed_lwd ? new Date(c.proposed_lwd).toLocaleDateString() + ' (Prop)' : 'TBD')}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${c.status === 'CLOSED' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                                                        c.status === 'INITIATED' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
+                                                            c.status === 'EXIT_SCHEDULED' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+                                                                'bg-purple-500/10 text-purple-500 border-purple-500/20'
+                                                        }`}>
+                                                        {c.status.replace(/_/g, ' ')}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    {isAdmin && c.status !== 'CLOSED' && (
+                                                        <button
+                                                            onClick={() => handleApproveStatus(c.id, c.status)}
+                                                            disabled={!isNoticeCompleted}
+                                                            title={!isNoticeCompleted ? "Notice period not yet completed" : "Move to next state"}
+                                                            className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 border rounded-lg transition-all ${isNoticeCompleted
+                                                                ? "text-emerald-500 hover:text-emerald-400 border-emerald-500/20 bg-emerald-500/5"
+                                                                : "text-slate-500 border-slate-700 bg-slate-800/50 cursor-not-allowed opacity-50"
+                                                                }`}
+                                                        >
+                                                            Move Next
+                                                        </button>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        )
+                                    })
                                 )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
 
-                                <div className="space-y-1">
-                                    {templates.length === 0 ? (
-                                        <div className="text-center py-8 text-slate-600 text-[10px] uppercase tracking-widest">No templates found</div>
-                                    ) : (
-                                        templates.map(t => (
-                                            <div
-                                                key={t.id}
-                                                onClick={() => setSelectedTemplateId(t.id)}
-                                                className={`group flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all ${selectedTemplateId === t.id
-                                                    ? 'bg-brand-500/10 border border-brand-500/20'
-                                                    : 'hover:bg-white/5 border border-transparent'
-                                                    }`}
-                                            >
-                                                <div>
-                                                    <div className={`text-xs font-bold ${selectedTemplateId === t.id ? 'text-brand-500' : 'text-slate-300'}`}>{t.name}</div>
-                                                    <div className="text-[9px] text-slate-500">{t.items.length} items</div>
-                                                </div>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); handleDeleteTemplate(t.id); }}
-                                                    className="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all"
-                                                >
-                                                    <X className="w-3 h-3" />
-                                                </button>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
+                {activeTab === 'checklists' && (
+                    <div className="grid grid-cols-12 min-h-[500px]">
+                        {/* Templates Sidebar */}
+                        <div className="col-span-12 md:col-span-4 border-r border-slate-800 bg-slate-900/50 p-6 space-y-4">
+                            <div className="flex items-center justify-between mb-4">
+                                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Checklist Templates</h4>
+                                <button
+                                    onClick={() => setIsCreatingTemplate(true)}
+                                    className="p-1 hover:bg-white/10 rounded transition-colors text-brand-500"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                </button>
                             </div>
 
-                            {/* Items Editor */}
-                            <div className="col-span-12 md:col-span-8 p-8 space-y-6">
-                                {selectedTemplateId ? (
-                                    <>
-                                        <div className="flex items-center justify-between">
+                            {isCreatingTemplate && (
+                                <div className="p-3 bg-slate-800 rounded-xl border border-brand-500/20 space-y-2 animate-fade-in">
+                                    <input
+                                        autoFocus
+                                        type="text"
+                                        placeholder="Template Name..."
+                                        value={newTemplateName}
+                                        onChange={e => setNewTemplateName(e.target.value)}
+                                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                                        onKeyDown={e => e.key === 'Enter' && handleCreateTemplate()}
+                                    />
+                                    <div className="flex gap-2">
+                                        <button onClick={handleCreateTemplate} className="flex-1 bg-brand-500 text-white text-[10px] font-bold py-1.5 rounded-lg hover:bg-brand-400 transition-colors">Create</button>
+                                        <button onClick={() => setIsCreatingTemplate(false)} className="px-2 py-1.5 text-slate-400 hover:text-white text-[10px] font-bold">Cancel</button>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="space-y-1">
+                                {templates.length === 0 ? (
+                                    <div className="text-center py-8 text-slate-600 text-[10px] uppercase tracking-widest">No templates found</div>
+                                ) : (
+                                    templates.map(t => (
+                                        <div
+                                            key={t.id}
+                                            onClick={() => setSelectedTemplateId(t.id)}
+                                            className={`group flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all ${selectedTemplateId === t.id
+                                                ? 'bg-brand-500/10 border border-brand-500/20'
+                                                : 'hover:bg-white/5 border border-transparent'
+                                                }`}
+                                        >
                                             <div>
-                                                <h3 className="text-lg font-bold text-white">
-                                                    {templates.find(t => t.id === selectedTemplateId)?.name}
-                                                </h3>
-                                                <p className="text-xs text-slate-500 uppercase tracking-widest font-black">Manage checklist items</p>
+                                                <div className={`text-xs font-bold ${selectedTemplateId === t.id ? 'text-brand-500' : 'text-slate-300'}`}>{t.name}</div>
+                                                <div className="text-[9px] text-slate-500">{t.items.length} items</div>
                                             </div>
                                             <button
-                                                onClick={() => setIsAddingItem(true)}
-                                                className="flex items-center gap-2 px-4 py-2 bg-brand-500/10 border border-brand-500/30 rounded-xl text-brand-500 hover:bg-brand-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest"
+                                                onClick={(e) => { e.stopPropagation(); handleDeleteTemplate(t.id); }}
+                                                className="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all"
                                             >
-                                                <Plus className="w-4 h-4" />
-                                                Add Item
+                                                <X className="w-3 h-3" />
                                             </button>
                                         </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
 
-                                        {isAddingItem && (
-                                            <div className="p-6 bg-slate-900 border border-brand-500/30 rounded-2xl space-y-4 animate-slide-up">
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div className="col-span-2">
-                                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 block">Task / Asset Name</label>
-                                                        <input
-                                                            type="text"
-                                                            value={newItemForm.task_name}
-                                                            onChange={e => setNewItemForm({ ...newItemForm, task_name: e.target.value })}
-                                                            placeholder="e.g. Return Laptop & Charger"
-                                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-500 transition-colors shadow-inner"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 block">Category</label>
-                                                        <select
-                                                            value={newItemForm.category}
-                                                            onChange={e => setNewItemForm({ ...newItemForm, category: e.target.value as any })}
-                                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-500 transition-colors shadow-inner appearance-none"
-                                                        >
-                                                            <option value="ASSETS">Assets Recovery</option>
-                                                            <option value="SECURITY">Security / Logic Access</option>
-                                                            <option value="MONEY">Financial / Pending Loans</option>
-                                                            <option value="HANDOVER">Knowledge Handover</option>
-                                                            <option value="OTHER">General / Other</option>
-                                                        </select>
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 block">Responsible Role</label>
-                                                        <select
-                                                            value={newItemForm.owner_role}
-                                                            onChange={e => setNewItemForm({ ...newItemForm, owner_role: e.target.value as any })}
-                                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-500 transition-colors shadow-inner appearance-none"
-                                                        >
-                                                            <option value="HR">HR Dept</option>
-                                                            <option value="IT">IT / Systems</option>
-                                                            <option value="FINANCE">Finance Dept</option>
-                                                            <option value="MANAGER">Reporting Manager</option>
-                                                        </select>
-                                                    </div>
+                        {/* Items Editor */}
+                        <div className="col-span-12 md:col-span-8 p-8 space-y-6">
+                            {selectedTemplateId ? (
+                                <>
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <h3 className="text-lg font-bold text-white">
+                                                {templates.find(t => t.id === selectedTemplateId)?.name}
+                                            </h3>
+                                            <p className="text-xs text-slate-500 uppercase tracking-widest font-black">Manage checklist items</p>
+                                        </div>
+                                        <button
+                                            onClick={() => setIsAddingItem(true)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-brand-500/10 border border-brand-500/30 rounded-xl text-brand-500 hover:bg-brand-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                            Add Item
+                                        </button>
+                                    </div>
+
+                                    {isAddingItem && (
+                                        <div className="p-6 bg-slate-900 border border-brand-500/30 rounded-2xl space-y-4 animate-slide-up">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="col-span-2">
+                                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 block">Task / Asset Name</label>
+                                                    <input
+                                                        type="text"
+                                                        value={newItemForm.task_name}
+                                                        onChange={e => setNewItemForm({ ...newItemForm, task_name: e.target.value })}
+                                                        placeholder="e.g. Return Laptop & Charger"
+                                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-500 transition-colors shadow-inner"
+                                                    />
                                                 </div>
-                                                <div className="flex justify-end gap-3 pt-2">
-                                                    <button onClick={() => setIsAddingItem(false)} className="px-6 py-2.5 text-xs font-black text-slate-500 uppercase tracking-widest hover:text-white hover:bg-white/5 rounded-xl transition-all">Cancel</button>
-                                                    <button onClick={handleAddItem} className="px-8 py-2.5 bg-brand-500 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-brand-400 transition-all shadow-lg shadow-brand-500/20">Add Task</button>
+                                                <div>
+                                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 block">Category</label>
+                                                    <select
+                                                        value={newItemForm.category}
+                                                        onChange={e => setNewItemForm({ ...newItemForm, category: e.target.value as any })}
+                                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-500 transition-colors shadow-inner appearance-none"
+                                                    >
+                                                        <option value="ASSETS">Assets Recovery</option>
+                                                        <option value="SECURITY">Security / Logic Access</option>
+                                                        <option value="MONEY">Financial / Pending Loans</option>
+                                                        <option value="HANDOVER">Knowledge Handover</option>
+                                                        <option value="OTHER">General / Other</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 block">Responsible Role</label>
+                                                    <select
+                                                        value={newItemForm.owner_role}
+                                                        onChange={e => setNewItemForm({ ...newItemForm, owner_role: e.target.value as any })}
+                                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-500 transition-colors shadow-inner appearance-none"
+                                                    >
+                                                        <option value="HR">HR Dept</option>
+                                                        <option value="IT">IT / Systems</option>
+                                                        <option value="FINANCE">Finance Dept</option>
+                                                        <option value="MANAGER">Reporting Manager</option>
+                                                    </select>
                                                 </div>
                                             </div>
-                                        )}
+                                            <div className="flex justify-end gap-3 pt-2">
+                                                <button onClick={() => setIsAddingItem(false)} className="px-6 py-2.5 text-xs font-black text-slate-500 uppercase tracking-widest hover:text-white hover:bg-white/5 rounded-xl transition-all">Cancel</button>
+                                                <button onClick={handleAddItem} className="px-8 py-2.5 bg-brand-500 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-brand-400 transition-all shadow-lg shadow-brand-500/20">Add Task</button>
+                                            </div>
+                                        </div>
+                                    )}
 
-                                        <div className="overflow-hidden border border-slate-800 rounded-2xl bg-slate-950/30">
-                                            <table className="w-full text-left">
-                                                <thead>
-                                                    <tr className="bg-slate-900/50 border-b border-slate-800">
-                                                        <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-widest">Task / Asset</th>
-                                                        <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-widest">Category</th>
-                                                        <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-widest">Owner</th>
-                                                        <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-widest text-right">Action</th>
+                                    <div className="overflow-hidden border border-slate-800 rounded-2xl bg-slate-950/30">
+                                        <table className="w-full text-left">
+                                            <thead>
+                                                <tr className="bg-slate-900/50 border-b border-slate-800">
+                                                    <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-widest">Task / Asset</th>
+                                                    <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-widest">Category</th>
+                                                    <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-widest">Owner</th>
+                                                    <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-widest text-right">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-800/50">
+                                                {templates.find(t => t.id === selectedTemplateId)?.items.length === 0 ? (
+                                                    <tr>
+                                                        <td colSpan={4} className="px-6 py-12 text-center text-slate-600 text-xs italic">
+                                                            No items in this template yet. Click "Add Item" to begin.
+                                                        </td>
                                                     </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-slate-800/50">
-                                                    {templates.find(t => t.id === selectedTemplateId)?.items.length === 0 ? (
-                                                        <tr>
-                                                            <td colSpan={4} className="px-6 py-12 text-center text-slate-600 text-xs italic">
-                                                                No items in this template yet. Click "Add Item" to begin.
+                                                ) : (
+                                                    templates.find(t => t.id === selectedTemplateId)?.items.map(item => (
+                                                        <tr key={item.id} className="hover:bg-white/5 transition-colors">
+                                                            <td className="px-6 py-4">
+                                                                <div className="text-xs font-bold text-white">{item.task_name}</div>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-black uppercase tracking-tighter">
+                                                                    {item.category}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <div className="text-[10px] font-bold text-slate-400">{item.owner_role}</div>
+                                                            </td>
+                                                            <td className="px-6 py-4 text-right">
+                                                                <button
+                                                                    onClick={() => handleDeleteItem(item.id)}
+                                                                    className="p-2 hover:bg-red-500/10 hover:text-red-500 text-slate-600 rounded-lg transition-all"
+                                                                    title="Remove Item"
+                                                                >
+                                                                    <X className="w-4 h-4" />
+                                                                </button>
                                                             </td>
                                                         </tr>
-                                                    ) : (
-                                                        templates.find(t => t.id === selectedTemplateId)?.items.map(item => (
-                                                            <tr key={item.id} className="hover:bg-white/5 transition-colors">
-                                                                <td className="px-6 py-4">
-                                                                    <div className="text-xs font-bold text-white">{item.task_name}</div>
-                                                                </td>
-                                                                <td className="px-6 py-4">
-                                                                    <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-black uppercase tracking-tighter">
-                                                                        {item.category}
-                                                                    </span>
-                                                                </td>
-                                                                <td className="px-6 py-4">
-                                                                    <div className="text-[10px] font-bold text-slate-400">{item.owner_role}</div>
-                                                                </td>
-                                                                <td className="px-6 py-4 text-right">
-                                                                    <button
-                                                                        onClick={() => handleDeleteItem(item.id)}
-                                                                        className="p-2 hover:bg-red-500/10 hover:text-red-500 text-slate-600 rounded-lg transition-all"
-                                                                        title="Remove Item"
-                                                                    >
-                                                                        <X className="w-4 h-4" />
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                        ))
-                                                    )}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
-                                        <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center">
-                                            <ShieldCheck className="w-10 h-10 text-slate-600" />
-                                        </div>
-                                        <div>
-                                            <h4 className="text-white font-bold">Select a Template</h4>
-                                            <p className="text-sm text-slate-500">Pick an exit checklist template from the left to manage its items.</p>
-                                        </div>
+                                                    ))
+                                                )}
+                                            </tbody>
+                                        </table>
                                     </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'fnf' && (
-                        <div className="p-12 text-center space-y-4">
-                            <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto">
-                                <DollarSign className="w-8 h-8 text-slate-500" />
-                            </div>
-                            <h3 className="text-lg font-bold text-white">Final Settlements (Coming Soon)</h3>
-                            <p className="text-sm text-slate-400 max-w-sm mx-auto">
-                                Calculate accumulated earnings, process leave encashments, and deduct pending advances.
-                            </p>
-                        </div>
-                    )}
-
-                    {activeTab === 'policy' && (
-                        <div className="p-8 space-y-8">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-lg font-bold text-white">Exit Policy Settings</h3>
-                                {isAdmin && !isEditingPolicy && (
-                                    <button
-                                        onClick={() => setIsEditingPolicy(true)}
-                                        className="btn-primary"
-                                    >
-                                        Edit Policies
-                                    </button>
-                                )}
-                            </div>
-
-                            {policy ? (
-                                <div className="grid grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Notice Period (Days)</div>
-                                        {isEditingPolicy ? (
-                                            <input
-                                                type="number"
-                                                className="input-field"
-                                                value={policyForm.notice_period_days ?? ''}
-                                                onChange={e => setPolicyForm({ ...policyForm, notice_period_days: parseInt(e.target.value) || 0 })}
-                                            />
-                                        ) : (
-                                            <div className="p-4 bg-slate-800/30 rounded-xl text-white font-bold">{policy.notice_period_days}</div>
-                                        )}
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Leave Encashment Enabled</div>
-                                        {isEditingPolicy ? (
-                                            <select
-                                                className="select-field"
-                                                value={policyForm.encash_leave_enabled ? 'true' : 'false'}
-                                                onChange={e => setPolicyForm({ ...policyForm, encash_leave_enabled: e.target.value === 'true' })}
-                                            >
-                                                <option value="true">Yes</option>
-                                                <option value="false">No</option>
-                                            </select>
-                                        ) : (
-                                            <div className="p-4 bg-slate-800/30 rounded-xl text-white font-bold">{policy.encash_leave_enabled ? 'Yes' : 'No'}</div>
-                                        )}
-                                    </div>
-                                    {isEditingPolicy && policyForm.encash_leave_enabled && (
-                                        <div className="space-y-2">
-                                            <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Max Encashment Days</div>
-                                            <input
-                                                type="number"
-                                                className="input-field"
-                                                value={policyForm.encash_leave_max_days ?? ''}
-                                                onChange={e => setPolicyForm({ ...policyForm, encash_leave_max_days: parseInt(e.target.value) || 0 })}
-                                            />
-                                        </div>
-                                    )}
-                                    {(policy.encash_leave_enabled && !isEditingPolicy) && (
-                                        <div className="space-y-2">
-                                            <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Max Encashment Days</div>
-                                            <div className="p-4 bg-slate-800/30 rounded-xl text-white font-bold">{policy.encash_leave_max_days}</div>
-                                        </div>
-                                    )}
-                                    <div className="space-y-2">
-                                        <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Absconding Treated as Unpaid</div>
-                                        {isEditingPolicy ? (
-                                            <select
-                                                className="select-field"
-                                                value={policyForm.absconding_unpaid_rule ? 'true' : 'false'}
-                                                onChange={e => setPolicyForm({ ...policyForm, absconding_unpaid_rule: e.target.value === 'true' })}
-                                            >
-                                                <option value="true">Yes</option>
-                                                <option value="false">No</option>
-                                            </select>
-                                        ) : (
-                                            <div className="p-4 bg-slate-800/30 rounded-xl text-white font-bold">{policy.absconding_unpaid_rule ? 'Yes' : 'No'}</div>
-                                        )}
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Allow Withdrawal</div>
-                                        {isEditingPolicy ? (
-                                            <select
-                                                className="select-field"
-                                                value={policyForm.allow_withdrawal ? 'true' : 'false'}
-                                                onChange={e => setPolicyForm({ ...policyForm, allow_withdrawal: e.target.value === 'true' })}
-                                            >
-                                                <option value="true">Yes</option>
-                                                <option value="false">No</option>
-                                            </select>
-                                        ) : (
-                                            <div className="p-4 bg-slate-800/30 rounded-xl text-white font-bold">{policy.allow_withdrawal ? 'Yes' : 'No'}</div>
-                                        )}
-                                    </div>
-                                    {isEditingPolicy && policyForm.allow_withdrawal && (
-                                        <div className="space-y-2">
-                                            <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Withdrawal Cutoff (Days before LWD)</div>
-                                            <input
-                                                type="number"
-                                                className="input-field"
-                                                value={policyForm.withdrawal_cutoff_days ?? ''}
-                                                onChange={e => setPolicyForm({ ...policyForm, withdrawal_cutoff_days: parseInt(e.target.value) || 0 })}
-                                            />
-                                        </div>
-                                    )}
-                                    {(policy.allow_withdrawal && !isEditingPolicy) && (
-                                        <div className="space-y-2">
-                                            <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Withdrawal Cutoff (Days before LWD)</div>
-                                            <div className="p-4 bg-slate-800/30 rounded-xl text-white font-bold">{policy.withdrawal_cutoff_days}</div>
-                                        </div>
-                                    )}
-
-                                </div>
+                                </>
                             ) : (
-                                <p className="text-slate-500 text-sm">No active exit policy configuration found.</p>
-                            )}
-
-                            {isEditingPolicy && (
-                                <div className="flex items-center gap-4 mt-8 pt-6 border-t border-slate-800/50">
-                                    <button
-                                        onClick={handleSavePolicy}
-                                        className="btn-primary"
-                                    >
-                                        <Check className="w-4 h-4 mr-2" />
-                                        Save Changes
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setIsEditingPolicy(false);
-                                            if (policy) setPolicyForm(policy);
-                                        }}
-                                        className="px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
-                                    >
-                                        Cancel
-                                    </button>
+                                <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
+                                    <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center">
+                                        <ShieldCheck className="w-10 h-10 text-slate-600" />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-white font-bold">Select a Template</h4>
+                                        <p className="text-sm text-slate-500">Pick an exit checklist template from the left to manage its items.</p>
+                                    </div>
                                 </div>
                             )}
                         </div>
-                    )}
-                </div>
-            )}
+                    </div>
+                )}
 
-            {/* Initiate Exit Modal */}
+                {activeTab === 'fnf' && (
+                    <div className="p-12 text-center space-y-4">
+                        <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto">
+                            <DollarSign className="w-8 h-8 text-slate-500" />
+                        </div>
+                        <h3 className="text-lg font-bold text-white">Final Settlements (Coming Soon)</h3>
+                        <p className="text-sm text-slate-400 max-w-sm mx-auto">
+                            Calculate accumulated earnings, process leave encashments, and deduct pending advances.
+                        </p>
+                    </div>
+                )}
+
+                {activeTab === 'policy' && (
+                    <div className="p-8 space-y-8">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-bold text-white">Exit Policy Settings</h3>
+                            {isAdmin && !isEditingPolicy && (
+                                <button
+                                    onClick={() => setIsEditingPolicy(true)}
+                                    className="btn-primary"
+                                >
+                                    Edit Policies
+                                </button>
+                            )}
+                        </div>
+
+                        {policy ? (
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Notice Period (Days)</div>
+                                    {isEditingPolicy ? (
+                                        <input
+                                            type="number"
+                                            className="input-field"
+                                            value={policyForm.notice_period_days ?? ''}
+                                            onChange={e => setPolicyForm({ ...policyForm, notice_period_days: parseInt(e.target.value) || 0 })}
+                                        />
+                                    ) : (
+                                        <div className="p-4 bg-slate-800/30 rounded-xl text-white font-bold">{policy.notice_period_days}</div>
+                                    )}
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Leave Encashment Enabled</div>
+                                    {isEditingPolicy ? (
+                                        <select
+                                            className="select-field"
+                                            value={policyForm.encash_leave_enabled ? 'true' : 'false'}
+                                            onChange={e => setPolicyForm({ ...policyForm, encash_leave_enabled: e.target.value === 'true' })}
+                                        >
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
+                                        </select>
+                                    ) : (
+                                        <div className="p-4 bg-slate-800/30 rounded-xl text-white font-bold">{policy.encash_leave_enabled ? 'Yes' : 'No'}</div>
+                                    )}
+                                </div>
+                                {isEditingPolicy && policyForm.encash_leave_enabled && (
+                                    <div className="space-y-2">
+                                        <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Max Encashment Days</div>
+                                        <input
+                                            type="number"
+                                            className="input-field"
+                                            value={policyForm.encash_leave_max_days ?? ''}
+                                            onChange={e => setPolicyForm({ ...policyForm, encash_leave_max_days: parseInt(e.target.value) || 0 })}
+                                        />
+                                    </div>
+                                )}
+                                {(policy.encash_leave_enabled && !isEditingPolicy) && (
+                                    <div className="space-y-2">
+                                        <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Max Encashment Days</div>
+                                        <div className="p-4 bg-slate-800/30 rounded-xl text-white font-bold">{policy.encash_leave_max_days}</div>
+                                    </div>
+                                )}
+                                <div className="space-y-2">
+                                    <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Absconding Treated as Unpaid</div>
+                                    {isEditingPolicy ? (
+                                        <select
+                                            className="select-field"
+                                            value={policyForm.absconding_unpaid_rule ? 'true' : 'false'}
+                                            onChange={e => setPolicyForm({ ...policyForm, absconding_unpaid_rule: e.target.value === 'true' })}
+                                        >
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
+                                        </select>
+                                    ) : (
+                                        <div className="p-4 bg-slate-800/30 rounded-xl text-white font-bold">{policy.absconding_unpaid_rule ? 'Yes' : 'No'}</div>
+                                    )}
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Allow Withdrawal</div>
+                                    {isEditingPolicy ? (
+                                        <select
+                                            className="select-field"
+                                            value={policyForm.allow_withdrawal ? 'true' : 'false'}
+                                            onChange={e => setPolicyForm({ ...policyForm, allow_withdrawal: e.target.value === 'true' })}
+                                        >
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
+                                        </select>
+                                    ) : (
+                                        <div className="p-4 bg-slate-800/30 rounded-xl text-white font-bold">{policy.allow_withdrawal ? 'Yes' : 'No'}</div>
+                                    )}
+                                </div>
+                                {isEditingPolicy && policyForm.allow_withdrawal && (
+                                    <div className="space-y-2">
+                                        <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Withdrawal Cutoff (Days before LWD)</div>
+                                        <input
+                                            type="number"
+                                            className="input-field"
+                                            value={policyForm.withdrawal_cutoff_days ?? ''}
+                                            onChange={e => setPolicyForm({ ...policyForm, withdrawal_cutoff_days: parseInt(e.target.value) || 0 })}
+                                        />
+                                    </div>
+                                )}
+                                {(policy.allow_withdrawal && !isEditingPolicy) && (
+                                    <div className="space-y-2">
+                                        <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Withdrawal Cutoff (Days before LWD)</div>
+                                        <div className="p-4 bg-slate-800/30 rounded-xl text-white font-bold">{policy.withdrawal_cutoff_days}</div>
+                                    </div>
+                                )}
+
+                            </div>
+                        ) : (
+                            <p className="text-slate-500 text-sm">No active exit policy configuration found.</p>
+                        )}
+
+                        {isEditingPolicy && (
+                            <div className="flex items-center gap-4 mt-8 pt-6 border-t border-slate-800/50">
+                                <button
+                                    onClick={handleSavePolicy}
+                                    className="btn-primary"
+                                >
+                                    <Check className="w-4 h-4 mr-2" />
+                                    Save Changes
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setIsEditingPolicy(false);
+                                        if (policy) setPolicyForm(policy);
+                                    }}
+                                    className="px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>            {/* Initiate Exit Modal */}
             <Modal isOpen={isRequestModalOpen} onClose={() => setIsRequestModalOpen(false)}>
                 <div
                     className="relative w-full max-w-xl bg-slate-950 border border-slate-800 flex flex-col shadow-2xl overflow-hidden rounded-[2.5rem] animate-slide-down mx-auto mt-[10vh]"
