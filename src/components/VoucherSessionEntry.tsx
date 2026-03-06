@@ -17,7 +17,7 @@ import {
 } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 
-import { FinancialYear, SystemConfiguration, Ledger, LedgerTag, Party, SessionFormData, VoucherFormData, StaffMaster } from '../types/accounting';
+import { FinancialYear, SystemConfiguration, Ledger, LedgerTag, Party, SessionFormData, VoucherFormData, StaffProfile } from '../types/accounting';
 import { formatNumber } from '../lib/validation';
 import { getBusinessDate } from '../lib/businessDate';
 import type { Voucher, Side, ApprovalStatus } from '../types/accounting';
@@ -94,7 +94,7 @@ export default function VoucherSessionEntry({
     const [showBankFlowModal, setShowBankFlowModal] = useState(false);
 
     // Staff Posting Modal State
-    const [staff, setStaff] = useState<StaffMaster[]>([]);
+    const [staff, setStaff] = useState<StaffProfile[]>([]);
     const [showStaffPostingModal, setShowStaffPostingModal] = useState(false);
     const [loadingStaff, setLoadingStaff] = useState(false);
 

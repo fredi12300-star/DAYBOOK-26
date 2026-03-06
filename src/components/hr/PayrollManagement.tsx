@@ -11,10 +11,10 @@ import {
     Save
 } from 'lucide-react';
 import {
-    StaffMaster
+    StaffProfile
 } from '../../types/accounting';
 import {
-    fetchStaffMasters,
+    fetchStaffProfiles,
     fetchMonthlySnapshots,
     generateMonthlySnapshotRPC,
     recomputeMonthlySnapshotsRPC,
@@ -34,7 +34,7 @@ const getLocalMonthString = (date: Date = new Date()) => {
 export default function PayrollManagement() {
     const { user, isSuperAdmin } = useAuth();
     const [selectedMonth, setSelectedMonth] = useState(getLocalMonthString());
-    const [staff, setStaff] = useState<StaffMaster[]>([]);
+    const [staff, setStaff] = useState<StaffProfile[]>([]);
 
     // Payroll State
     const [monthlySnapshots, setMonthlySnapshots] = useState<any[]>([]);
@@ -63,7 +63,7 @@ export default function PayrollManagement() {
 
     async function loadBaseData() {
         try {
-            const staffData = await fetchStaffMasters();
+            const staffData = await fetchStaffProfiles();
             setStaff(staffData);
         } catch (error) {
             console.error('Error loading staff for payroll:', error);

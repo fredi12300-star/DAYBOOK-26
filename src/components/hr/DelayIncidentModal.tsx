@@ -3,9 +3,9 @@ import {
     ShieldAlert, Check, X,
     AlertCircle, Info, Save, Clock, Search
 } from 'lucide-react';
-import { StaffMaster, ShiftGroup, AttendanceIncidentType } from '../../types/accounting';
+import { StaffProfile, ShiftGroup, AttendanceIncidentType } from '../../types/accounting';
 import {
-    requestAttendanceIncidentRPC, fetchStaffMasters, fetchShiftGroups
+    requestAttendanceIncidentRPC, fetchStaffProfiles, fetchShiftGroups
 } from '../../lib/supabase';
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
 }
 
 export default function DelayIncidentModal({ isOpen, onClose, onSuccess, currentDate }: Props) {
-    const [staff, setStaff] = useState<StaffMaster[]>([]);
+    const [staff, setStaff] = useState<StaffProfile[]>([]);
     const [shiftGroups, setShiftGroups] = useState<ShiftGroup[]>([]);
     const [isSaving, setIsSaving] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -40,10 +40,10 @@ export default function DelayIncidentModal({ isOpen, onClose, onSuccess, current
     async function loadData() {
         try {
             const [staffData, groupsData] = await Promise.all([
-                fetchStaffMasters(),
+                fetchStaffProfiles(),
                 fetchShiftGroups()
             ]);
-            setStaff(staffData.filter((s: StaffMaster) => s.is_active));
+            setStaff(staffData.filter((s: StaffProfile) => s.is_active));
             setShiftGroups(groupsData);
         } catch (error) {
             console.error('Error loading modal data:', error);
@@ -203,7 +203,7 @@ export default function DelayIncidentModal({ isOpen, onClose, onSuccess, current
                                     />
                                 </div>
                                 <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                                    {staff.filter(s => s.full_name.toLowerCase().includes(searchQuery.toLowerCase()) || s.staff_code.toLowerCase().includes(searchQuery.toLowerCase())).map((s: StaffMaster) => (
+                                    {staff.filter(s => s.full_name.toLowerCase().includes(searchQuery.toLowerCase()) || s.staff_code.toLowerCase().includes(searchQuery.toLowerCase())).map((s: StaffProfile) => (
                                         <button
                                             key={s.id}
                                             onClick={() => {

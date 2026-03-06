@@ -3,13 +3,13 @@ import {
     X, Users, Search, UserCheck,
     AlertCircle, Send, Loader2, Building2
 } from 'lucide-react';
-import { StaffMaster } from '../types/accounting';
+import { StaffProfile } from '../types/accounting';
 
 interface StaffPostingModalProps {
     isOpen: boolean;
     onClose: () => void;
     onConfirm: (selectedStaffIds: string[], responsibleStaffId: string | null, exceptionReason?: string) => void;
-    staff: StaffMaster[];
+    staff: StaffProfile[];
     loading?: boolean;
     isApprovalRequired?: boolean;
     isAdmin?: boolean;
@@ -95,7 +95,7 @@ export default function StaffPostingModal({
         });
     };
 
-    const handleSelectResponsible = (s: StaffMaster) => {
+    const handleSelectResponsible = (s: StaffProfile) => {
         // Enable them if not already enabled
         setSelectedIds(prev => {
             const next = new Set(prev);

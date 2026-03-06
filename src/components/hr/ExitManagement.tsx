@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabase';
 import {
     ExitCase,
     ExitPolicy,
-    StaffMaster,
+    StaffProfile,
 } from '../../types/accounting';
 import Modal from '../ui/Modal';
 import { useAuth } from '../../lib/auth';
@@ -19,7 +19,7 @@ import {
     deleteExitChecklistTemplate,
     createExitChecklistItem,
     deleteExitChecklistItem,
-    fetchStaffMasters
+    fetchStaffProfiles
 } from '../../lib/supabase';
 
 import {
@@ -44,7 +44,7 @@ export function ExitManagement() {
     const [activeTab, setActiveTab] = useState<TabType>('requests');
     const [cases, setCases] = useState<ExitCase[]>([]);
     const [policy, setPolicy] = useState<ExitPolicy | null>(null);
-    const [staff, setStaff] = useState<StaffMaster[]>([]);
+    const [staff, setStaff] = useState<StaffProfile[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     // Checklist State
@@ -87,7 +87,7 @@ export function ExitManagement() {
                 setCases(fetchedCases);
 
                 // Fetch staff for dropdown
-                const staffData = await fetchStaffMasters(true);
+                const staffData = await fetchStaffProfiles(true);
                 setStaff(staffData);
             } else if (activeTab === 'checklists') {
                 const templatesData = await fetchExitChecklistTemplates();

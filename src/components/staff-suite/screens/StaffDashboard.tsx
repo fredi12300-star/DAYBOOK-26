@@ -6,10 +6,10 @@ import {
     Briefcase,
     ShieldCheck
 } from 'lucide-react';
-import { StaffMaster, AttendanceRecord } from '../../../types/accounting';
+import { StaffProfile, AttendanceRecord } from '../../../types/accounting';
 
 interface StaffDashboardProps {
-    staff: StaffMaster | null;
+    staff: StaffProfile | null;
     todayAttendance: AttendanceRecord | null;
     leaveBalance: any[];
     onNavigate: (tab: string) => void;

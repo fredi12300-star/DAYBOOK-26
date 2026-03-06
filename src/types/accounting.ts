@@ -1005,7 +1005,7 @@ export interface LeaveBalance {
     incentive_status: 'ELIGIBLE' | 'HALF' | 'NOT_ELIGIBLE' | 'NOT_EVALUATED';
     updated_at: string;
     // Joined
-    staff?: StaffMaster;
+    staff?: StaffProfile;
 }
 
 export interface LeaveRequest {
@@ -1024,7 +1024,7 @@ export interface LeaveRequest {
     created_at?: string;
     updated_at?: string;
     // Joined
-    staff?: StaffMaster;
+    staff?: StaffProfile;
     days?: LeaveDay[];
 }
 
@@ -1114,7 +1114,7 @@ export interface ExitCase {
     updated_at?: string;
 
     // Joined
-    staff?: StaffMaster;
+    staff?: StaffProfile;
 }
 
 export interface ExitChecklistTemplate {

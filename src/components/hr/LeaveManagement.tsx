@@ -7,10 +7,10 @@ import {
 import {
     fetchLeavePolicies, fetchActiveLeavePolicy, upsertLeavePolicy,
     fetchLeaveRequests, upsertLeaveRequest, approveLeaveRequest,
-    fetchLeaveBalances, fetchStaffMasters
+    fetchLeaveBalances, fetchStaffProfiles
 } from '../../lib/supabase';
 import {
-    LeavePolicy, LeaveRequest, LeaveBalance, StaffMaster
+    LeavePolicy, LeaveRequest, LeaveBalance, StaffProfile
 } from '../../types/accounting';
 import { useAuth } from '../../lib/auth';
 import Modal from '../ui/Modal';
@@ -23,7 +23,7 @@ const LeaveManagement: React.FC<LeaveManagementProps> = ({ initialTab = 'request
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<'requests' | 'balances' | 'settings' | 'attendance'>(initialTab);
     const [loading, setLoading] = useState(true);
-    const [staff, setStaff] = useState<StaffMaster[]>([]);
+    const [staff, setStaff] = useState<StaffProfile[]>([]);
 
     // Requests State
     const [requests, setRequests] = useState<LeaveRequest[]>([]);
@@ -167,7 +167,7 @@ const LeaveManagement: React.FC<LeaveManagementProps> = ({ initialTab = 'request
         setLoading(true);
         try {
             const [staffData, policyData, activePol] = await Promise.all([
-                fetchStaffMasters(true),
+                fetchStaffProfiles(true),
                 fetchLeavePolicies(),
                 fetchActiveLeavePolicy()
             ]);

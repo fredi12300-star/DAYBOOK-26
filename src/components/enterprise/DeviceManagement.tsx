@@ -8,9 +8,9 @@ import {
     fetchDevices, upsertDevice, provisionDeviceAccount,
     deleteDevice, updateUserAuthCredentials,
     fetchDeviceDepartments, upsertDeviceDepartment, fetchDevicesByDepartment,
-    fetchStaffMasters, updateStaffMaster
+    fetchStaffProfiles, updateStaffProfile
 } from '../../lib/supabase';
-import { Device, DeviceDepartment, StaffMaster } from '../../types/accounting';
+import { Device, DeviceDepartment, StaffProfile } from '../../types/accounting';
 import { MODULE_CATEGORIES, MODULES, ACTIONS } from '../../constants/permissions';
 import { useAuth } from '../../lib/auth';
 import Modal from '../ui/Modal';
@@ -37,7 +37,7 @@ export default function DeviceManagement() {
 
     // Dept Settings Modal Tabs
     const [deptModalTab, setDeptModalTab] = useState<'DEPARTMENTS' | 'ASSIGN_STAFF'>('DEPARTMENTS');
-    const [staffList, setStaffList] = useState<StaffMaster[]>([]);
+    const [staffList, setStaffList] = useState<StaffProfile[]>([]);
     const [loadingStaff, setLoadingStaff] = useState(false);
     const [updatingStaffId, setUpdatingStaffId] = useState<string | null>(null);
 
@@ -201,7 +201,7 @@ export default function DeviceManagement() {
     const loadStaff = async () => {
         setLoadingStaff(true);
         try {
-            const data = await fetchStaffMasters(true); // only active staff
+            const data = await fetchStaffProfiles(true); // only active staff
             setStaffList(data);
         } catch (error) {
             console.error('Error loading staff:', error);
@@ -213,7 +213,7 @@ export default function DeviceManagement() {
     const handleAssignStaffDept = async (staffId: string, deptId: string | null) => {
         setUpdatingStaffId(staffId);
         try {
-            await updateStaffMaster(staffId, {
+            await updateStaffProfile(staffId, {
                 department_id: deptId || null
             });
             await loadStaff();

@@ -1,8 +1,8 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { Shield, Plus, Trash2, KeyRound, AlertCircle, RefreshCw, Eye, EyeOff, Lock, CheckCircle, X, ChevronRight, Mail, Loader2, Save } from 'lucide-react';
-import { fetchRoles, upsertRole, deleteRole, fetchStaffMasters, fetchUserOrgAccess, upsertUserOrgAccess, revokeUserOrgAccess, supabase } from '../../lib/supabase';
+import { fetchRoles, upsertRole, deleteRole, fetchStaffProfiles, fetchUserOrgAccess, upsertUserOrgAccess, revokeUserOrgAccess, supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
-import { Role, StaffMaster, UserOrgAccess } from '../../types/accounting';
+import { Role, StaffProfile, UserOrgAccess } from '../../types/accounting';
 import { MODULE_CATEGORIES, MODULES, ACTIONS } from '../../constants/permissions';
 import Modal from '../ui/Modal';
 
@@ -50,7 +50,7 @@ function RoleDetailModal({
     onTogglePermission,
     onClose,
     isSuperAdmin,
-    StaffMasters = [],
+    StaffProfiles = [],
     assignedStaffIds = [],
     onToggleStaffAssignment,
     onUpdateRole,
@@ -67,7 +67,7 @@ function RoleDetailModal({
     onTogglePermission?: (moduleId: string, actionId: string) => void;
     onClose: () => void;
     isSuperAdmin: boolean;
-    StaffMasters?: (StaffMaster & { userId?: string })[];
+    StaffProfiles?: (StaffProfile & { userId?: string })[];
     assignedStaffIds?: string[];
     onToggleStaffAssignment?: (staffId: string, assigned: boolean) => Promise<void>;
     onUpdateRole?: (name: string, description: string, duties: { id: string, text: string }[]) => Promise<void>;
@@ -506,7 +506,7 @@ function RoleDetailModal({
 
                             <div className="space-y-3">
                                 {(() => {
-                                    const linkedStaff = StaffMasters.filter(s => s.userId);
+                                    const linkedStaff = StaffProfiles.filter(s => s.userId);
                                     const assignedStaff = linkedStaff.filter(s => assignedStaffIds.includes(s.id));
                                     const displayStaff = assignedStaff.length > 0 ? assignedStaff : linkedStaff;
 
@@ -719,7 +719,7 @@ export default function RoleManagement() {
     const [currentPermissions, setCurrentPermissions] = useState<Record<string, string[] | boolean>>({});
 
     // Staff Assignment State
-    const [StaffMasters, setStaffMasters] = useState<(StaffMaster & { userId?: string })[]>([]);
+    const [StaffProfiles, setStaffProfiles] = useState<(StaffProfile & { userId?: string })[]>([]);
     const [userOrgAccess, setUserOrgAccess] = useState<UserOrgAccess[]>([]);
     useEffect(() => {
         if (!isSuperAdmin && activeTab === 'ADMIN') {
@@ -734,7 +734,7 @@ export default function RoleManagement() {
             setLoading(true);
             const [data, staff, access, { data: profiles }] = await Promise.all([
                 fetchRoles(),
-                fetchStaffMasters(),
+                fetchStaffProfiles(),
                 fetchUserOrgAccess(),
                 supabase.from('user_profiles').select('id, staff_id')
             ]);
@@ -745,7 +745,7 @@ export default function RoleManagement() {
                 return { ...s, userId: p?.id };
             });
 
-            setStaffMasters(mergedStaff);
+            setStaffProfiles(mergedStaff);
             setUserOrgAccess(access);
         } catch (error: any) {
             console.error('Error loading roles data:', error);
@@ -788,7 +788,7 @@ export default function RoleManagement() {
     const handleToggleStaffAssignment = async (staffId: string, assigned: boolean) => {
         if (!detailModalRole?.id) return;
         try {
-            const staff = StaffMasters.find(s => s.id === staffId);
+            const staff = StaffProfiles.find(s => s.id === staffId);
             if (!staff?.userId) {
                 alert('This staff member does not have a linked user account.');
                 return;
@@ -985,7 +985,7 @@ export default function RoleManagement() {
                     .filter(r => r.category === activeTab)
                     .map(role => {
                         const assignedAccess = userOrgAccess.find(a => a.role_id === role.id);
-                        const assignedStaff = assignedAccess ? StaffMasters.find(s => s.userId === assignedAccess.user_id) : null;
+                        const assignedStaff = assignedAccess ? StaffProfiles.find(s => s.userId === assignedAccess.user_id) : null;
                         const assignedStaffName = assignedStaff ? assignedStaff.full_name : undefined;
                         const roleAssignedCount = assignedStaff ? 1 : 0;
 
@@ -1045,9 +1045,9 @@ export default function RoleManagement() {
                 category={detailModalRole?.category || 'JOB'}
                 onClose={() => setDetailModalRole(null)}
                 isSuperAdmin={isSuperAdmin}
-                StaffMasters={StaffMasters}
+                StaffProfiles={StaffProfiles}
                 assignedStaffIds={userOrgAccess.filter(a => a.role_id === detailModalRole?.id).map(a => {
-                    const staff = StaffMasters.find(s => s.userId === a.user_id);
+                    const staff = StaffProfiles.find(s => s.userId === a.user_id);
                     return staff ? staff.id : '';
                 }).filter(id => id !== '')}
                 onToggleStaffAssignment={handleToggleStaffAssignment}
