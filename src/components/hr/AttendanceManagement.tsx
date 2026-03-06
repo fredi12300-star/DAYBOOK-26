@@ -621,12 +621,12 @@ export default function AttendanceManagement() {
                                                                             'bg-slate-900 text-slate-400'
                                                                         }`}
                                                                 >
-                                                                    <option value="PRESENT">Present</option>
-                                                                    <option value="ABSENT">Absent</option>
-                                                                    <option value="HALF_DAY">Half Day</option>
-                                                                    <option value="MISS_PUNCH">Miss Punch</option>
-                                                                    <option value="LATE_PRESENT">Late Present</option>
-                                                                    <option value="EARLY_OUT">Early Out</option>
+                                                                    <option value="PRESENT" className="bg-slate-950 text-slate-300">Present</option>
+                                                                    <option value="ABSENT" className="bg-slate-950 text-slate-300">Absent</option>
+                                                                    <option value="HALF_DAY" className="bg-slate-950 text-slate-300">Half Day</option>
+                                                                    <option value="MISS_PUNCH" className="bg-slate-950 text-slate-300">Miss Punch</option>
+                                                                    <option value="LATE_PRESENT" className="bg-slate-950 text-slate-300">Late Present</option>
+                                                                    <option value="EARLY_OUT" className="bg-slate-950 text-slate-300">Early Out</option>
                                                                 </select>
 
                                                                 <button
