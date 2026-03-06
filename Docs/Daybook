@@ -1,0 +1,728 @@
+Stacks
+
+Technology Stack Overview
+🎨 Frontend Framework & UI
+•	React 19.1.0 - Latest version of React for building the user interface
+•	TypeScript 5.8.3 - Strongly-typed JavaScript for better code quality and developer experience
+•	Tailwind CSS 3.4.1 - Utility-first CSS framework for styling
+•	Lucide React - Modern icon library for UI elements
+•	React Router v7.1.1 - Client-side routing and navigation
+🏗️ Build Tools & Development
+•	Vite 7.0.4 - Super-fast build tool and development server
+•	Running on port 1420 (dev server)
+•	Hot Module Replacement (HMR) enabled
+•	Optimized for Tauri integration
+•	PostCSS 8.4.33 - CSS processing tool
+•	Autoprefixer 10.4.16 - Automatic vendor prefixing for CSS
+•	ESLint 9.17.0 - Code linting and quality checks
+🖥️ Desktop Application Framework
+•	Tauri v2 - Rust-based desktop application framework
+•	Creates native Windows, macOS, and Linux apps
+•	Much lighter than Electron (smaller bundle size)
+•	Better performance and security
+•	Rust (backend via Cargo)
+•	Serde & Serde JSON for serialization
+•	Tauri plugins (opener plugin for external links)
+☁️ Backend & Database
+•	Supabase - Backend-as-a-Service platform
+•	PostgreSQL database (cloud-hosted)
+•	Real-time subscriptions
+•	Storage and authentication capabilities
+•	@supabase/supabase-js 2.39.0
+ - JavaScript client library
+📊 Data Visualization & Processing
+•	Recharts 2.10.3 - Charting library for dashboard analytics
+•	XLSX 0.18.5 - Excel file reading/writing for import/export
+•	PDF-Parse 1.1.1 - PDF parsing for invoice processing
+•	UUID 11.0.3 - Unique identifier generation
+🔧 Development Configuration
+TypeScript Configuration:
+•	Target: ES2020
+•	Module: ESNext
+•	Strict mode enabled
+•	React JSX transformation
+Build Architecture:
+•	Module bundler resolution
+•	Tree-shaking for optimized bundles
+•	Separate configurations for app and node environments
+🚀 Deployment & Hosting
+•	Vercel - Web deployment configuration present
+•	Native Desktop Apps - Can be built for Windows, macOS, and Linux via Tauri
+💡 Key Architectural Decisions
+1.	Hybrid Approach: Web app that can also run as a native desktop application
+2.	Cloud-First: Uses Supabase for database instead of local SQLite
+3.	Modern Stack: Latest versions of React, Vite, and Tauri for best performance
+4.	Type Safety: Full TypeScript implementation for reduced bugs
+5.	Utility-First CSS: Tailwind for rapid UI development
+This is a modern, production-ready stack that combines the best of web technologies with native desktop capabilities, making your daybook application fast, secure, and cross-platform compatible! 🎯
+
+
+
+
+Double Entry Day Book
+
+
+0) The Accounting “Physics” Your Software Must Respect
+Think of accounting like laws of physics:
+✅ LAW 1: Money never disappears
+It only moves between accounts.
+Example:
+If Cash increases → something else must decrease or income must increase.
+✅ LAW 2: Every transaction is always a “transfer”
+Even if user thinks it’s “just payment”, internally it’s:
+From Account → To Account
+Example:
+Salary paid = Money moved from Cash → Salary Expense.
+✅ LAW 3: Debit/Credit is NOT positive/negative
+Debit = left side
+Credit = right side
+That’s it.
+Whether it increases or decreases depends on account type.
+✅ Assets/Expenses increase on Debit
+✅ Liabilities/Income/Equity increase on Credit
+________________________________________
+1) What Your Software is REALLY Building
+Your software is building a mini accounting database like this:
+✅ Ledger master = “Where money can sit”
+✅ Voucher = “One event that moved money”
+✅ Voucher lines = “The legs of the movement”
+✅ Reports = “Summaries of all movements”
+So don’t think “Daybook = list of cash entries”
+Think:
+✅ Daybook = raw journal
+________________________________________
+2) Chart of Accounts (COA) — The Brain of Your Software
+Most people underestimate this.
+Your system becomes powerful only when COA is clean.
+✅ 2.1 Ledger Types (Nature)
+Each ledger must belong to only ONE nature:
+•	ASSET
+•	LIABILITY
+•	INCOME
+•	EXPENSE
+•	EQUITY
+✅ Why nature matters?
+Because your reports depend on it:
+✅ P&L uses: INCOME + EXPENSE
+✅ Balance Sheet uses: ASSET + LIABILITY + EQUITY
+✅ Trial Balance uses everything
+________________________________________
+✅ 2.2 Group vs Ledger (Professional structure)
+Don’t store nature directly in ledger always.
+Instead:
+✅ ledger_groups table:
+•	Current Assets
+•	Bank
+•	Direct Income
+•	Indirect Expense
+•	Duties & Taxes
+•	Loans (Liability)
+•	Capital (Equity)
+Then each group has a “nature”.
+This gives you Tally style reports.
+________________________________________
+✅ 2.3 Normal Side (Helper only)
+Every ledger can have a normal balance field.
+•	Assets/Expenses → DR normal
+•	Liabilities/Income/Equity → CR normal
+⚠️ This is not a fixed Dr/Cr for posting
+It’s only for default suggestions and running balance display.
+________________________________________
+3) Voucher System — The Engine Core
+A voucher is your atomic transaction record.
+✅ 3.1 Voucher Header is the “container”
+Header stores:
+•	Voucher number (human)
+•	Voucher ID (UUID)
+•	Date
+•	Voucher type
+•	Status (Draft/Posted/Reversed)
+•	Narration
+•	Branch
+•	Created by
+✅ Why totals must be stored in header?
+Because it creates fast validations and fast reporting filters.
+________________________________________
+✅ 3.2 Voucher Lines are the “legs”
+Each line must be:
+✅ One ledger
+✅ One side only (DR or CR)
+✅ One amount only
+✅ Optional party link
+A line should NEVER contain both debit and credit.
+________________________________________
+✅ 3.3 Why your “line structure” should be side + amount
+Instead of:
+•	debit column + credit column
+Use:
+•	side = DR/CR
+•	amount = numeric
+Because UI and database become simpler.
+But both are valid models.
+________________________________________
+4) Predefined Heads + Auto Dr/Cr (The Right Way)
+Now let’s build the best structure.
+✅ 4.1 Two Concepts You Must Separate
+✅ A) Ledger Head (Account)
+Example:
+Cash in Hand
+✅ B) Template Role (Meaning inside voucher type)
+Example:
+In Money Transfer voucher, Cash is always “Received From Customer”
+So we don’t auto side from ledger nature.
+We auto side from voucher type role mapping.
+________________________________________
+✅ 4.2 The Template System (Professional Level)
+A template is a blueprint of a voucher.
+It defines:
+✅ which ledgers appear
+✅ which side they default to
+✅ whether they are locked
+✅ which lines take user input
+✅ which lines are calculated automatically
+________________________________________
+✅ Template Example: Money Transfer Cash
+MT_RECEIPT Template
+1.	Cash in Hand → DR → input = Transfer + commission (or full)
+2.	Remittance Payable → CR → input = Transfer amount
+3.	Commission Income → CR → input = commission
+Now staff enters only two numbers:
+✅ transfer amount
+✅ commission
+Software fills everything else.
+________________________________________
+5) The “Template Engine Tables” (Best Database Design)
+✅ 5.1 templates table
+Stores master template:
+•	template_id
+•	voucher_type_id
+•	template_name
+•	is_active
+✅ 5.2 template_lines table
+Stores blueprint lines:
+•	template_line_id
+•	template_id
+•	ledger_id
+•	default_side (DR/CR)
+•	is_fixed_side (TRUE/FALSE)
+•	is_required (TRUE/FALSE)
+•	amount_rule (INPUT/FIXED/CALCULATED)
+•	calc_formula (optional)
+✅ This makes templates programmable.
+________________________________________
+✅ 5.3 Why formula support is powerful?
+Example in Jewellery Sale:
+GST = total × 3%
+So template can auto-split:
+•	Sales income
+•	GST output
+Without staff doing math.
+________________________________________
+6) Posting Logic (The Heart of the System)
+This is what separates “simple software” from “real accounting software”.
+✅ 6.1 Posting flow
+Step 1: Build voucher object
+Collect header + lines.
+Step 2: Normalize lines
+Convert UI into proper lines:
+•	Remove blank
+•	Ensure side exists
+•	Ensure amount > 0
+Step 3: Validation engine
+✅ must pass or block saving.
+________________________________________
+✅ 6.2 Validation engine (Advanced checks)
+✅ A) Structural validation
+•	voucher type exists
+•	minimum 2 lines
+•	no duplicate line IDs
+•	each line has ledger_id
+•	line amount > 0
+•	side is DR/CR only
+✅ B) Accounting validation
+•	total DR == total CR
+•	no forbidden ledgers inactive
+•	date within open period
+✅ C) Business validation (template based)
+•	required ledgers must exist
+•	side must match if fixed
+•	party mandatory if required
+Example:
+In “Customer Ledger Receipt”, party must be chosen.
+________________________________________
+✅ 6.3 Voucher numbering (must be concurrency-safe)
+Never generate voucher_no on app side.
+Do it inside DB transaction:
+✅ select sequence row FOR UPDATE
+✅ read next_number
+✅ create voucher_no
+✅ increment next_number
+✅ commit
+This prevents duplicates in multi-user environment.
+________________________________________
+✅ 6.4 Atomic Save Rule (Never break books)
+Posting must be one transaction:
+✅ Insert voucher header
+✅ Insert voucher lines
+✅ Insert audit log
+✅ Commit
+If any fails → rollback
+________________________________________
+7) Audit Trail (Indian compliance ready)
+This is extremely important.
+Your audit table must store:
+✅ Action
+✅ User
+✅ DateTime
+✅ Old value JSON
+✅ New value JSON
+✅ Reason (for reverse/override)
+Examples of actions:
+•	CREATE
+•	POST
+•	REVERSE
+•	OVERRIDE_UNLOCK
+•	DELETE_ATTEMPT
+✅ This makes your software “audit-grade”.
+________________________________________
+8) Reversal System (Perfect correction method)
+Reversal voucher logic:
+Take original voucher lines and swap sides:
+DR becomes CR
+CR becomes DR
+Mark original voucher:
+status = REVERSED
+link reversal voucher ID
+✅ Never delete vouchers.
+Never directly edit posted vouchers.
+________________________________________
+9) Reporting Engine (Real accounting reports)
+Now deep dive into reporting.
+✅ 9.1 Day Book
+Simple list:
+voucher header + total + type
+Filters:
+date range, type, ledger, party
+________________________________________
+✅ 9.2 Ledger Statement (Running balance)
+This is the most important report.
+For one ledger:
+Show all voucher lines affecting it, ordered by date.
+Running balance logic:
+For Assets & Expenses:
+Balance = (opening + DR - CR)
+For Liabilities & Income:
+Balance = (opening + CR - DR)
+✅ Ledger nature decides formula.
+________________________________________
+✅ 9.3 Trial Balance
+Trial balance is the proof system works.
+It lists:
+each ledger + closing balance
+Sum of all DR balances = Sum of all CR balances
+If mismatch → system has corruption.
+✅ So trial balance is your “health check”.
+________________________________________
+✅ 9.4 Profit & Loss
+Only INCOME and EXPENSE groups:
+Profit = Income - Expense
+________________________________________
+✅ 9.5 Balance Sheet
+Assets = Liabilities + Equity
+This is built from ledger balances grouped by nature.
+________________________________________
+10) Handling Parties (Customer/Vendor)
+This is how professional software does party accounts.
+✅ You have a “Customer Ledger Control” system:
+Option A (Simple):
+One ledger called “Customer Receivable”
+Then party_id tracks the customer.
+Option B (Professional):
+Every customer is a ledger (Tally style)
+✅ Best hybrid:
+•	keep “control ledger”
+•	store party subledger as party_id
+This scales best.
+________________________________________
+11) Real-World Edge Cases (Most software fails here)
+Let’s cover what breaks systems.
+________________________________________
+✅ Case 1: Partial payments
+Example: Sale 10,000, customer paid 2,000
+•	Customer Receivable DR 10,000
+•	Sales Income CR 10,000
+Then receipt:
+•	Cash DR 2,000
+•	Customer Receivable CR 2,000
+Outstanding = 8,000
+________________________________________
+✅ Case 2: Advance received
+Customer gives advance for jewellery.
+•	Cash DR 5,000
+•	Customer Advance (Liability) CR 5,000
+Later sale uses it:
+•	Customer Advance DR 5,000
+•	Sales/Invoice CR 5,000 (part settlement)
+________________________________________
+✅ Case 3: Discounts
+Discount is expense OR reduction in income.
+Correct way:
+•	Cash DR (after discount)
+•	Discount Allowed DR
+•	Sales Income CR (full)
+________________________________________
+✅ Case 4: GST handling
+Professional way:
+Sales split into:
+•	Sales Income
+•	Output GST Payable
+Purchases split into:
+•	Purchase
+•	Input GST Receivable
+________________________________________
+12) Performance + Data Integrity (Scaling rules)
+✅ Use indexes on:
+•	vouchers(date)
+•	voucher_lines(ledger_id)
+•	voucher_lines(party_id)
+•	vouchers(branch_id,date)
+✅ Never store balances as truth.
+Always compute from voucher lines.
+You can cache balances for speed but regenerate if needed.
+________________________________________
+✅ FINAL: What makes your software “Tally-grade”
+If you include these 7 things, you are building a serious accounting system:
+✅ Chart of Accounts with nature + groups
+✅ Voucher header + voucher lines journal system
+✅ Template engine with fixed heads + auto sides
+✅ Strong validations (structural + accounting + business)
+✅ Atomic posting (DB transaction)
+✅ Audit trail + reversal correction
+✅ Full reports: Ledger, Trial, P&L, Balance Sheet
+
+
+
+
+
+
+
+
+Absolutely ✅
+Here is a full detailed guide to build a Universal Double-Entry Day Book Software with Predefined Heads + Auto Dr/Cr selection, so staff never gets confused and your books never break.
+This model works for any business (Jewellery, Gold Loan, Money Transfer, E-Seva, Wholesale, Retail, Service, Manufacturing).
+________________________________________
+✅ UNIVERSAL DAY BOOK SOFTWARE BLUEPRINT (With Auto Dr/Cr Heads)
+1) What you are building (Simple definition)
+Your software is basically a Journal System where:
+✅ Every entry = Voucher (Transaction)
+✅ Every voucher contains 2 or more lines
+✅ Each line is a Ledger Head + Dr or Cr + Amount
+✅ Total Debit = Total Credit
+✅ Reports are generated from these voucher lines
+This is real accounting.
+________________________________________
+2) Core Idea: “Predefined Heads + Auto Dr/Cr”
+✅ The correct way (Accounting-safe)
+A ledger cannot have permanent Dr/Cr always.
+Example:
+•	Bank can be Dr (money received)
+•	Bank can be Cr (money paid)
+So we don’t fix Dr/Cr forever.
+✅ Instead we define Dr/Cr based on Voucher Type / Template role
+That means:
+•	In a Money Transfer voucher, Cash is always Dr.
+•	In a Loan Issue voucher, Cash/Bank is always Cr.
+✅ This is how professional accounting software works.
+________________________________________
+3) Your Software Engine Must Have These 6 Parts
+(A) Ledger Master (Chart of Accounts)
+This is your “Heads list”.
+Ledger fields (minimum)
+•	ledger_id
+•	ledger_name (Cash in Hand, Sales, Commission Income, Remittance Payable…)
+•	nature (ASSET / LIABILITY / INCOME / EXPENSE / EQUITY)
+•	is_active
+•	opening_balance (optional)
+✅ This is universal.
+________________________________________
+(B) Voucher Types (Transaction categories)
+Examples:
+•	RECEIPT
+•	PAYMENT
+•	SALE
+•	PURCHASE
+•	JOURNAL
+•	MONEY_TRANSFER
+•	GOLD_LOAN_ISSUE
+•	GOLD_LOAN_CLOSURE
+•	ESEVA_COLLECTION
+Voucher type decides:
+✅ Which heads appear
+✅ Which side they default to (Dr/Cr)
+________________________________________
+(C) Voucher Header Table (1 row per voucher)
+Stores main transaction details:
+•	voucher_id
+•	voucher_no (MT-000025)
+•	date
+•	voucher_type
+•	narration
+•	branch_id
+•	total_debit
+•	total_credit
+•	status (DRAFT/POSTED/REVERSED)
+•	created_by, created_at
+________________________________________
+(D) Voucher Lines Table (2+ rows per voucher)
+Each line is one ledger impact:
+•	line_id
+•	voucher_id
+•	ledger_id
+•	party_id (optional)
+•	side (DR/CR) ✅
+•	amount ✅
+•	line_narration (optional)
+•	external_ref (UPI/Bank ref)
+Rule:
+✅ Every line must be DR OR CR (not both)
+________________________________________
+(E) Template Engine (Predefined Heads + default Dr/Cr)
+This is your big feature.
+A template is:
+✅ A ready-made voucher structure with fixed heads + default Dr/Cr.
+Example: Money Transfer Cash Template
+•	Cash in Hand → DR
+•	Remittance Payable → CR
+•	Commission Income → CR
+Staff just enters amounts.
+________________________________________
+(F) Validation + Audit + Reversal System
+Your software must enforce:
+✅ Total Dr = Total Cr
+✅ Minimum 2 lines
+✅ No zero / negative
+✅ Lock editing after posting
+✅ Correction only via Reversal
+✅ Audit log (who did what and when)
+________________________________________
+✅ 4) How to Implement “Auto Dr/Cr Predefined Heads” Correctly
+✅ The Best Method: “Voucher Type Default Side Mapping”
+Create a mapping table like this:
+TABLE: voucher_type_default_sides
+voucher_type_id	ledger_id	default_side	is_fixed
+MT_RECEIPT	Cash in Hand	DR	TRUE
+MT_RECEIPT	Remittance Payable	CR	TRUE
+MT_RECEIPT	Commission Income	CR	TRUE
+default_side = DR / CR
+is_fixed = if TRUE, staff cannot change side
+✅ This makes entry 100% staff-proof.
+________________________________________
+5) The Golden Rule for Auto Side
+✅ Side selection priority (perfect logic)
+When user selects a Ledger Head inside a voucher:
+✅ Priority 1: If mapping exists for that voucher type → use it
+✅ Priority 2: Else use “Normal Balance” from ledger nature
+•	Assets / Expenses → DR
+•	Liabilities / Income → CR
+✅ Priority 3: Let user choose manually (if not fixed)
+________________________________________
+✅ 6) Universal Voucher Templates You MUST Create
+Below are the most important templates that cover almost every business.
+________________________________________
+✅ Template 1: Receipt (Cash In)
+Customer pays you money for anything.
+Cash / Bank → DR
+Income OR Party → CR
+Example (Service payment received):
+•	Cash DR 500
+•	Service Charges Income CR 500
+________________________________________
+✅ Template 2: Payment (Cash Out)
+You pay rent, salary, expense.
+Expense → DR
+Cash / Bank → CR
+Example:
+•	Rent Expense DR 10,000
+•	Cash CR 10,000
+________________________________________
+✅ Template 3: Money Transfer (Your Step-1 Model)
+Customer gives money to send + commission.
+MT_RECEIPT
+•	Cash DR (3000 + commission)
+•	Remittance Payable CR 3000
+•	Commission Income CR commission
+MT_SETTLEMENT
+•	Remittance Payable DR 3000
+•	Bank CR 3000
+✅ Clean separation:
+•	Customer money = Liability
+•	Your earnings = Income
+________________________________________
+✅ Template 4: E-Seva Collection
+Customer pays service fee + govt fee.
+ES_COLLECTION
+•	Cash/Bank DR Total received
+•	Govt Payable CR Govt fee portion
+•	Service Charge Income CR Your income
+ES_GOVT_PAYMENT
+•	Govt Payable DR
+•	Bank CR
+________________________________________
+✅ Template 5: Jewellery Sale (Cash)
+JEWELL_SALE_CASH
+•	Cash/Bank DR Total
+•	Sales Income CR Base
+•	Output GST CR GST
+________________________________________
+✅ Template 6: Jewellery Purchase (Stock In)
+JEWELL_PURCHASE
+•	Stock/Inventory DR
+•	Supplier Payable CR
+If paid immediately:
+•	Supplier Payable DR
+•	Cash/Bank CR
+________________________________________
+✅ Template 7: Repair (Profit visible separately)
+Customer pays 500, goldsmith gets 300.
+Repair receipt
+•	Cash DR 500
+•	Repair Income CR 500
+Goldsmith payment
+•	Repair Expense DR 300
+•	Cash/Bank CR 300
+✅ Profit = automatic (200)
+________________________________________
+✅ Template 8: Gold Loan Issue
+GL_ISSUE
+•	Gold Loan Receivable DR (Principal)
+•	Cash/Bank CR (Paid out)
+GL_INTEREST_RECEIPT
+•	Cash/Bank DR
+•	Interest Income CR
+GL_CLOSURE
+•	Cash/Bank DR (Principal return)
+•	Gold Loan Receivable CR
+________________________________________
+✅ 7) UI Design That Makes This “Staff-Proof”
+A) Day Book Entry Screen (Perfect layout)
+Header Card
+•	Date (default today)
+•	Voucher Type dropdown
+•	Voucher No auto-generated (read-only)
+•	Narration (required)
+•	Reference no (optional)
+•	Party/Customer (optional)
+Template Selector
+✅ toggle: “Use template”
+When ON:
+•	software auto inserts the correct lines with fixed heads + sides
+Voucher Line Grid
+Columns:
+•	Ledger Head ✅ (dropdown search)
+•	Side ✅ (auto-filled Dr/Cr)
+•	Amount ✅
+•	Party (optional)
+•	External Ref (optional)
+Bottom:
+•	Total Debit
+•	Total Credit
+•	Difference (must be 0)
+Save Buttons
+✅ Save as Draft
+✅ Save & Post
+✅ Reverse Voucher (only posted)
+________________________________________
+✅ 8) How “Save & Post” Logic Must Work (Step-by-step)
+Step 1: Build lines
+User selects voucher type + fills lines.
+Step 2: Auto side assignment
+When ledger selected:
+•	apply default_side mapping
+•	lock side if is_fixed = TRUE
+Step 3: Validation checks (block save if any fails)
+✅ at least 2 lines
+✅ no line amount = 0
+✅ only DR or CR per line
+✅ total_dr = total_cr
+✅ voucher date allowed (not locked period)
+✅ ledgers active
+✅ audit entry created
+Step 4: Generate Voucher Number safely
+Use sequences:
+•	MT-000001
+•	JEW-000001
+Step 5: Atomic save
+Single DB transaction:
+•	insert voucher header
+•	insert all voucher lines
+•	insert audit record
+commit ✅
+rollback if any fail ✅
+Step 6: Lock editing
+After posting:
+•	no direct edits allowed
+•	only reversal allowed
+________________________________________
+✅ 9) Reversal System (Correcting mistakes)
+If someone posted wrong entry:
+✅ Create a new voucher that flips every line:
+Original:
+•	Cash DR 1000
+•	Income CR 1000
+Reversal:
+•	Cash CR 1000
+•	Income DR 1000
+✅ This keeps the audit trail perfect.
+________________________________________
+✅ 10) Universal Reports Your Software Can Generate
+Because your data structure is journal-based, reports become automatic:
+✅ Day Book Report (all vouchers by date)
+✅ Ledger Statement (ledger-wise running balance)
+✅ Cash Book
+✅ Bank Book
+✅ Trial Balance
+✅ Profit & Loss
+✅ Outstanding Payables/Receivables
+✅ Customer/Party Statement
+✅ Remittance Payable Pending (money transfer)
+✅ Commission Income summary
+________________________________________
+✅ 11) Best Practice: Make Heads “Simple + Standard”
+Your default head list should include:
+Assets
+•	Cash in Hand
+•	Bank Accounts
+•	Customer Receivable
+•	Stock/Inventory
+•	Loan Receivable
+Liabilities
+•	Supplier Payable
+•	Customer Advance
+•	Remittance Payable
+•	Govt Payable
+•	GST Payable
+Income
+•	Sales Income
+•	Commission Income
+•	Service Charges Income
+•	Interest Income
+•	Making Charges Income
+Expense
+•	Salary
+•	Rent
+•	Electricity
+•	Bank Charges
+•	Repair Expense
+✅ These cover 90% businesses.
+________________________________________
+✅ Final Perfect Result You Get
+If you implement this model:
+✅ Staff will NEVER struggle with Dr/Cr
+✅ Transactions become 3x faster
+✅ Errors drop massively
+✅ Audit trail becomes clean
+✅ Reports become real accounting-grade
+✅ Works for Jewellery + Finance + E-Seva + any business
+________________________________________
+
+

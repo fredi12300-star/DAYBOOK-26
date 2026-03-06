@@ -1,0 +1,345 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ================================================================
+   GLOBAL STYLES - PROFESSIONAL ENTERPRISE EDITION
+   ================================================================ */
+
+@layer base {
+  * {
+    @apply border-slate-200/40 dark:border-slate-800/40;
+  }
+
+  body {
+    @apply bg-slate-50 dark:bg-[#020617];
+    @apply text-slate-900 dark:text-slate-100;
+    @apply font-sans antialiased;
+    @apply min-h-screen selection:bg-brand-500/20;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@layer components {
+
+  /* Explicit utility overrides for @apply reliability */
+  .shadow-premium {
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1), 0 4px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .shadow-premium-hover {
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15), 0 8px 20px -10px rgba(0, 0, 0, 0.08);
+  }
+
+  .shadow-glow {
+    box-shadow: 0 0 25px -5px rgba(72, 86, 242, 0.4);
+  }
+
+  /* ================================================================
+     PROFESSIONAL SURFACE
+     ================================================================ */
+  .surface-card {
+    @apply bg-slate-900/60 backdrop-blur-3xl;
+    @apply border border-slate-700/60;
+    @apply shadow-premium rounded-[2.5rem];
+    overflow: hidden;
+  }
+
+  .surface-card-hover {
+    @apply surface-card;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    @apply hover:shadow-glow hover:border-brand-500/30;
+    @apply hover:-translate-y-1;
+  }
+
+  /* ================================================================
+     SUBTLE GLASSMORPHISM
+     ================================================================ */
+  .glass-panel {
+    @apply bg-slate-900/40 backdrop-blur-2xl;
+    @apply border border-white/10 dark:border-slate-700/40;
+    @apply shadow-premium rounded-2xl;
+  }
+
+  /* ================================================================
+     REFINED HEADERS
+     ================================================================ */
+  .page-header {
+    @apply bg-white dark:bg-[#0f172a] border-b border-slate-200 dark:border-slate-800/30 py-6 mb-8;
+  }
+
+  .card-header {
+    @apply bg-slate-50/80 dark:bg-slate-800/40 px-6 py-4 border-b border-slate-200 dark:border-slate-800;
+  }
+
+  /* ================================================================
+     ENTERPRISE BUTTONS
+     ================================================================ */
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+    transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand-600 text-white hover:bg-brand-700 shadow-lg shadow-brand-600/20 hover:shadow-glow;
+  }
+
+  .btn-secondary {
+    @apply btn bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800/50 hover:text-white;
+  }
+
+  .btn-ghost {
+    @apply btn text-slate-600 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100;
+  }
+
+  .btn-danger {
+    @apply btn bg-white dark:bg-slate-900 text-rose-600 border border-rose-200 dark:border-rose-900/30 hover:bg-rose-50 dark:hover:bg-rose-950/30;
+  }
+
+  .btn-icon {
+    @apply p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-brand-500 active:scale-90;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  }
+
+  /* ================================================================
+     PROFESSIONAL INPUTS
+     ================================================================ */
+  .input-field {
+    @apply w-full px-5 py-4 rounded-2xl text-[13px] font-medium;
+    @apply bg-[#020617]/50 backdrop-blur-sm shadow-inner;
+    @apply border border-slate-700/80;
+    @apply focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500/50 outline-none;
+    @apply text-slate-100 placeholder:text-slate-600;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .input-field:hover {
+    @apply border-slate-700 bg-[#020617]/70;
+  }
+
+  .select-field {
+    @apply input-field cursor-pointer appearance-none bg-no-repeat bg-[right_1.25rem_center];
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-size: 1rem;
+  }
+
+  .input-base {
+    @apply bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-2 text-xs font-bold text-white placeholder:text-slate-600 focus:ring-1 focus:ring-brand-500/50 outline-none transition-all;
+  }
+
+  .input-base:hover {
+    @apply border-slate-700 bg-slate-900/80;
+  }
+
+  /* Hiding Spin Buttons (Arrows) for Number Inputs */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+
+  /* Make date/time input calendar icon white */
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator,
+  input[type="month"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+    opacity: 0.5;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator:hover,
+  input[type="time"]::-webkit-calendar-picker-indicator:hover,
+  input[type="month"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
+
+  /* ================================================================
+     MODERN DATA TABLE
+     ================================================================ */
+  .table-container {
+    @apply surface-card border-slate-800/10;
+  }
+
+  .table-head-cell {
+    @apply px-6 py-4 text-left text-[10px] font-black text-slate-500 dark:text-slate-500 uppercase tracking-[0.2em] bg-slate-50/30 dark:bg-slate-900/40;
+  }
+
+  .table-row {
+    @apply border-b border-slate-100 dark:border-slate-800/10 hover:bg-slate-50/80 dark:hover:bg-[#0f172a]/40;
+    transition: background-color 0.15s ease;
+  }
+
+  .table-cell {
+    @apply px-6 py-5 text-[13px] font-medium align-middle;
+  }
+
+  /* ================================================================
+     REFINED BADGES
+     ================================================================ */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest border;
+  }
+
+  .badge-success {
+    @apply bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-500 dark:border-emerald-500/20;
+  }
+
+  .badge-warning {
+    @apply bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-500 dark:border-amber-500/20;
+  }
+
+  .badge-danger {
+    @apply bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-500 dark:border-rose-500/20;
+  }
+
+  .badge-neutral {
+    @apply bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-800;
+  }
+
+  /* ================================================================
+     GLOBAL MODAL SYSTEM
+     ================================================================ */
+  .modal-backdrop {
+    @apply fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-3xl animate-fade-in;
+  }
+
+  .modal-content-container {
+    @apply fixed inset-0 z-[101] flex items-center justify-center p-6 pointer-events-none;
+  }
+
+  .modal-content {
+    @apply pointer-events-auto w-full flex justify-center;
+  }
+
+
+}
+
+/* Scrollbar Refinement */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-50 dark:bg-slate-950;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 dark:bg-slate-600 rounded-full;
+  /* Removed excessive border that was creating invisibility */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400 dark:bg-slate-500;
+}
+
+.spinner {
+  @apply inline-block w-5 h-5 border-2 border-brand-500 border-t-transparent rounded-full animate-spin;
+}
+
+@keyframes slide-left {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-left {
+  animation: slide-left 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+@keyframes slide-down {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-down {
+  animation: slide-down 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pulse-slow {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes blink-red {
+
+  0%,
+  100% {
+    border-color: rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 15px -5px rgba(239, 68, 68, 0.2);
+  }
+
+  50% {
+    border-color: rgba(239, 68, 68, 1);
+    box-shadow: 0 0 25px -2px rgba(239, 68, 68, 0.5);
+  }
+}
+
+.animate-blink-red {
+  animation: blink-red 1.5s ease-in-out infinite;
+}
+
+.alert-overlay {
+  z-index: 9999 !important;
+}

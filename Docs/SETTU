@@ -1,0 +1,275 @@
+────────────────────────────────────────────
+KIRAN IN  —  VOUCHERS (You RECEIVE from Kiran)
+────────────────────────────────────────────
+
+IN-1) Borrow Cash  → Repay Cash  (Borrow part)
+
+Voucher: KIRAN IN – Borrow Cash
+• Dr Cash in Hand (₹)
+• Cr Kiran – Cash Payable (₹)
+
+
+IN-2) Borrow Cash  → Repay Gold  (Instant conversion)
+
+Voucher: KIRAN IN – Borrow Cash → Gold Liability
+• Dr Cash in Hand (₹)
+• Cr Kiran – Cash Payable (₹)
+• Dr Kiran – Cash Payable (₹)
+• Cr Kiran – Gold Payable (Fine GM)
+
+(End state after IN:
+ Cash ↑ , Gold Payable ↑ , Cash Payable = 0)
+
+
+IN-3) Borrow Gold  → Repay Gold
+
+Voucher: KIRAN IN – Borrow Gold
+• Dr Gold Stock – Fine (Fine GM)
+• Cr Kiran – Gold Payable (Fine GM)
+
+
+IN-4) Borrow Gold  → Repay Cash  (Instant conversion)
+
+Voucher: KIRAN IN – Borrow Gold → Cash Liability
+• Dr Gold Stock – Fine (Fine GM)
+• Cr Kiran – Gold Payable (Fine GM)
+• Dr Kiran – Gold Payable (Fine GM)
+• Cr Kiran – Cash Payable (₹)
+
+(End state after IN:
+ Gold Stock ↑ , Cash Payable ↑ , Gold Payable = 0)
+
+────────────────────────────────────────────
+KIRAN OUT  —  VOUCHERS (You PAY to Kiran)
+────────────────────────────────────────────
+
+OUT-1) Repay Cash
+
+Voucher: KIRAN OUT – Repay Cash
+• Dr Kiran – Cash Payable (₹)
+• Cr Cash / Bank (₹)
+
+
+OUT-2) Repay Gold
+
+Voucher: KIRAN OUT – Repay Gold
+• Dr Kiran – Gold Payable (Fine GM)
+• Cr Gold Stock – Fine (Fine GM)
+
+────────────────────────────────────────────
+KIRAN TRADE / CONVERSION  —  NO LIABILITY
+────────────────────────────────────────────
+
+V1) Kiran – Sale of Gold for Cash
+(Asset exchange, no borrowing, no repayment)
+
+Voucher: KIRAN – Sale of Gold for Cash
+• Dr Cash in Hand / Bank (₹)
+• Cr Gold Stock – Fine (Fine GM)
+
+(Key characteristics:
+ ✔ No Kiran Payable involved
+ ✔ No liability created
+ ✔ Pure asset-to-asset conversion
+ ✔ Should NOT appear in Borrow/Repay reports)
+
+
+
+
+
+1) SCENARIO
+────────
+• Borrowed ₹1,50,000 from Kiran
+• Agreed gold liability = 12.0000 GM (24kt fine)
+• On settlement day, you have 16.0000 GM
+• You repay 12.0000 GM to Kiran
+• You convert remaining 4.0000 GM to cash
+STEP 1 — BORROW FROM KIRAN (Instant Cash → Gold Liability)
+TEMPLATE USED
+─────────────
+KIRAN IN – Borrow Cash → Gold Liability
+(IN-2)
+VOUCHER POSTING
+──────────────
+Dr  Cash in Hand                     ₹ 1,50,000
+Cr  Kiran – Cash Payable             ₹ 1,50,000
+Dr  Kiran – Cash Payable             ₹ 1,50,000
+Cr  Kiran – Gold Payable             12.0000 GM
+END STATE AFTER STEP 1
+─────────────────────
+• Cash in Hand      ↑ ₹1,50,000
+• Kiran Gold Payable = 12.0000 GM
+• Kiran Cash Payable = 0
+✔ Liability correctly recorded in gold only
+✔ Rate is locked at borrowing time
+✔ Clean, audit-safe
+
+STEP 2 — REPAY KIRAN IN GOLD (12 GM)
+TEMPLATE USED
+─────────────
+KIRAN OUT – Repay Gold
+(OUT-2)
+VOUCHER POSTING
+──────────────
+Dr  Kiran – Gold Payable             12.0000 GM
+Cr  Gold Stock – Fine                12.0000 GM
+END STATE AFTER STEP 2
+─────────────────────
+• Kiran Gold Payable = 0
+• Gold Stock reduced by 12 GM
+• Kiran fully settled
+✔ Borrow cycle CLOSED
+✔ No cash movement here
+✔ Liability completely cleared
+
+STEP 3 — SELL REMAINING 4 GM FOR CASH
+(Important: this is NOT borrowing, NOT repayment)
+
+TEMPLATE USED
+─────────────
+KIRAN – Sale of Gold for Cash
+(V1)
+VOUCHER POSTING
+──────────────
+Dr  Cash in Hand / Bank              ₹ (value of 4.0000 GM)
+Cr  Gold Stock – Fine                4.0000 GM
+END STATE AFTER STEP 3
+─────────────────────
+• Extra cash realised from surplus gold
+• No Kiran payable involved
+• Pure asset conversion
+✔ Correctly excluded from IN / OUT
+✔ Will not pollute borrowing reports
+✔ Clean profit visibility (via gold value)
+
+FULL TEMPLATE LIST USED (SUMMARY)
+1) KIRAN IN – Borrow Cash → Gold Liability
+2) KIRAN OUT – Repay Gold
+3) KIRAN – Sale of Gold for Cash
+
+
+
+
+
+2) SCENARIO
+────────
+Borrowed cash from Kiran: ₹1,50,000
+Agreed gold liability: 12.0000 Fine GM (24kt)
+
+At settlement day:
+• Gold available with you: 10.0000 GM
+• Balance to be settled in cash: 2.0000 GM
+STEP 1 — KIRAN IN (Borrow Cash → Gold Liability)
+You borrowed cash and instantly fixed gold liability.
+
+────────────────────────────────────────────
+TEMPLATE : KIRAN IN – Borrow Cash → Gold Liability
+────────────────────────────────────────────
+
+Dr  Cash in Hand                      ₹1,50,000
+Cr  Kiran – Cash Payable              ₹1,50,000
+Dr  Kiran – Cash Payable              ₹1,50,000
+Cr  Kiran – Gold Payable              12.0000 GM
+
+End State after IN:
+• Cash in Hand ↑
+• Kiran Gold Payable = 12.0000 GM
+• Kiran Cash Payable = 0
+────────────────────────────────────────────
+✔ Liability fully expressed in gold
+✔ Cash payable is only a bridge
+✔ This voucher stands alone and is auditable
+
+STEP 2 — PARTIAL SETTLEMENT IN GOLD (10 GM)
+You give 10 GM gold to Kiran.
+
+────────────────────────────────────────────
+TEMPLATE : KIRAN OUT – Repay Gold
+────────────────────────────────────────────
+
+Dr  Kiran – Gold Payable              10.0000 GM
+Cr  Gold Stock – Fine                 10.0000 GM
+
+Remaining Liability after this step:
+• Kiran Gold Payable = 2.0000 GM
+────────────────────────────────────────────
+✔ Partial settlement supported
+✔ Gold stock reduced correctly
+✔ Liability still open (2 GM)
+
+STEP 3 — CONVERT REMAINING GOLD LIABILITY → CASH
+You don’t have gold for the remaining 2 GM,
+so you convert that liability into cash at the agreed rate.
+
+This is NOT borrowing again
+This is liability conversion
+
+────────────────────────────────────────────
+TEMPLATE : KIRAN – Convert Gold Liability → Cash
+────────────────────────────────────────────
+
+Dr  Kiran – Gold Payable              2.0000 GM
+Cr  Kiran – Cash Payable              ₹25,000   (example rate)
+
+(Example:
+₹12,500 per GM × 2 GM = ₹25,000)
+
+End State after conversion:
+• Kiran Gold Payable = 0
+• Kiran Cash Payable = ₹25,000
+────────────────────────────────────────────
+✔ Gold liability fully cleared
+✔ Cash liability created only for balance portion
+
+STEP 4 — FINAL CASH SETTLEMENT (2 GM value)
+You pay the remaining amount in cash.
+────────────────────────────────────────────
+TEMPLATE : KIRAN OUT – Repay Cash
+────────────────────────────────────────────
+
+Dr  Kiran – Cash Payable              ₹25,000
+Cr  Cash in Hand / Bank               ₹25,000
+Final State:
+• No Gold Payable
+• No Cash Payable
+• Kiran fully settled
+────────────────────────────────────────────
+FULL TEMPLATE FLOW (ONE-LOOK SUMMARY)
+1️⃣ KIRAN IN – Borrow Cash → Gold Liability
+   Creates 12 GM gold payable
+
+2️⃣ KIRAN OUT – Repay Gold
+   Settles 10 GM
+
+3️⃣ KIRAN – Convert Gold → Cash
+   Converts remaining 2 GM to ₹
+
+4️⃣ KIRAN OUT – Repay Cash
+   Final settlement
+
+
+
+
+To handle multiple karats (14, 18, 22, etc.) and convert them for Kiran (24kt), you should use a "Bucket" Ledger and a Conversion Voucher.
+
+1. The Ledger (The Bucket)
+Create one single ledger to group all your purchases:
+
+Ledger Name: Old Gold Stock (Mixed Karats)
+Nature: ASSET
+Key Setting: Allow Quantity: YES.
+How to use: Whenever you buy gold from a customer (whether it is 18kt or 22kt), record it into this one ledger. The "Quantity" will track the total gross weight you have in the shop.
+2. The Voucher (The Conversion)
+Since you need to "turn" this mixed gold into 24kt for Kiran, you need a Voucher to move the weight.
+
+Voucher Type: Create a new one called GOLD CONVERSION (Nature: JOURNAL).
+3. The Template (The Calculation)
+Create a template called "Convert to Fine (24kt)":
+
+CR (Credit): Old Gold Stock (Mixed Karats) -> Put the Full Weight you are melting (e.g., 10g of 22kt).
+DR (Debit): Gold Stock – Fine -> Put the Calculated 24kt Weight (e.g., 9.16g).
+Why this is better?
+
+Grouping: You don't need 10 different ledgers for 14kt, 18kt, etc. One "Mixed" ledger keeps your reports clean.
+Tracking: You can always see exactly how much "Mixed" weight you have waiting to be melted.
+Accuracy: Once converted to the Gold Stock – Fine ledger, it is ready to be used in your KIRAN OUT – Repay Gold templates.

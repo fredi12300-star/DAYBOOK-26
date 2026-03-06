@@ -1,0 +1,39 @@
+105: allow_cross_branch_reports BOOLEAN DEFAULT FALSE,
+158: scope_type VARCHAR(20) NOT NULL CHECK (scope_type IN ('GLOBAL', 'REGION', 'BRANCH')),
+199: -- Branch
+204: bank_branch VARCHAR(100),
+568: IF TG_OP = 'DELETE' THEN v_branch_id := OLD.branch_id;
+569: ELSE v_branch_id := NEW.branch_id; END IF;
+614: -- Save Voucher (branch-aware + optimistic lock)
+797: -- Voucher Reversal (branch-aware)
+812: IF v_original.branch_id IS DISTINCT FROM p_branch_id THEN
+813: RAISE EXCEPTION 'PERMISSION_DENIED: Branch mismatch';
+853: -- Reporting: Ledger Statement (branch-aware)
+946: -- Trial Balance (hierarchical, branch-aware)
+1023: AND (p_branch_id IS NULL OR l.OR l.branch_id IS NULL)
+1242: -- Ensure default branches exist
+1243: INSERT INTO public.branches (branch_name, branch_code, is_active)
+1244: VALUES ('Main Branch', 'MAIN', TRUE)
+1245: ON CONFLICT (branch_name) DO NOTHING;
+1247: INSERT INTO public.branches (branch_name, branch_code, is_active)
+1248: VALUES ('Second Branch', 'SEC', TRUE)
+1249: ON CONFLICT (branch_name) DO NOTHING;
+1257: SELECT id INTO v_branch_id FROM public.branches WHERE branch_code = 'MAIN' LIMIT 1;
+1263: -- Create base ledgers (with branch_id) only if missing
+1269: 'ASSET', 'DR', 0, FALSE, TRUE, TRUE, v_inr_id, v_branch_id
+1273: 'ASSET', 'DR', 0, TRUE, FALSE, TRUE, v_inr_id, v_branch_id
+1277: 'LIABILITY', 'CR', 0, TRUE, FALSE, TRUE, v_inr_id, v_branch_id
+1281: 'LIABILITY', 'CR', 0, TRUE, FALSE, TRUE, v_inr_id, v_branch_id
+1285: 'ASSET', 'DR', 0, TRUE, FALSE, TRUE, v_inr_id, v_branch_id
+1289: 'INCOME', 'CR', 0, TRUE, FALSE, TRUE, v_inr_id, v_branch_id
+1293: 'EXPENSE', 'DR', 0, TRUE, FALSE, TRUE, v_inr_id, v_branch_id
+1297: 'EXPENSE', 'DR', 0, TRUE, FALSE, TRUE, v_inr_id, v_branch_id
+1301: -- Ensure branch_id set for system ledgers
+1303: SET branch_id = COALESCE( v_branch_id),
+3390: -- staff_branch_mapping policy — guarded: table may not exist in this schema
+3393: IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'staff_branch_mapping') THEN
+3394: DROP POLICY IF EXISTS "RLS: staff_branch_mapping ALL" ON public.staff_branch_mapping;
+3396: CREATE POLICY "RLS: staff_branch_mapping ALL"
+3397: ON public.staff_branch_mapping
+4042: -- 2. Add timezone tracking to system and branches
+4046: ALTER TABLE public.branches

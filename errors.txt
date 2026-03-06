@@ -1,0 +1,36 @@
+﻿src/components/enterprise/ApprovalRequestsHub.tsx(1,3): error TS1443: Module declaration names may only use ' or " quoted strings.
+src/components/enterprise/ApprovalRequestsHub.tsx(86,48): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(86,57): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(86,70): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(86,80): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(86,92): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(86,109): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(110,46): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(110,57): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(110,64): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(110,71): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(110,84): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(110,104): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(110,121): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(124,53): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(124,65): error TS1005: '(' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(124,66): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(124,71): error TS1005: ',' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(139,50): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(139,59): error TS1005: ')' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(139,66): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(139,81): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(139,91): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+src/components/enterprise/ApprovalRequestsHub.tsx(139,95): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(139,107): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(139,114): error TS1434: Unexpected keyword or identifier.
+src/components/enterprise/ApprovalRequestsHub.tsx(175,46): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(175,53): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(175,62): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(175,75): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(175,82): error TS1434: Unexpected keyword or identifier.
+src/components/enterprise/ApprovalRequestsHub.tsx(175,102): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(175,110): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(175,120): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(175,132): error TS1005: ';' expected.
+src/components/enterprise/ApprovalRequestsHub.tsx(253,1): error TS1160: Unterminated template literal.
