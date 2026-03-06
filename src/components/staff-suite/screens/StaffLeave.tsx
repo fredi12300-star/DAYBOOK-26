@@ -1021,7 +1021,7 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
                                                     required
                                                     value={formData.from_date}
                                                     onChange={e => setFormData(p => ({ ...p, from_date: e.target.value }))}
-                                                    className="w-full bg-slate-900 border border-slate-800 text-white rounded-2xl px-5 py-3 text-xs focus:ring-2 focus:ring-brand-500/20 outline-none transition-all"
+                                                    className="w-full bg-slate-900 border border-slate-800 text-white rounded-2xl px-5 py-3 text-xs focus:ring-2 focus:ring-brand-500/20 outline-none transition-all [color-scheme:dark]"
                                                 />
                                             </div>
                                             <div className="flex gap-3">
@@ -1047,7 +1047,7 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
                                                         required
                                                         value={formData.from_date}
                                                         onChange={e => setFormData(p => ({ ...p, from_date: e.target.value }))}
-                                                        className="w-full bg-slate-900 border border-slate-800 text-white rounded-2xl px-4 py-3 text-[10px] focus:ring-2 focus:ring-brand-500/20 outline-none transition-all"
+                                                        className="w-full bg-slate-900 border border-slate-800 text-white rounded-2xl px-4 py-3 text-[10px] focus:ring-2 focus:ring-brand-500/20 outline-none transition-all [color-scheme:dark]"
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
@@ -1057,7 +1057,7 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
                                                         required
                                                         value={formData.to_date}
                                                         onChange={e => setFormData(p => ({ ...p, to_date: e.target.value }))}
-                                                        className="w-full bg-slate-900 border border-slate-800 text-white rounded-2xl px-4 py-3 text-[10px] focus:ring-2 focus:ring-brand-500/20 outline-none transition-all"
+                                                        className="w-full bg-slate-900 border border-slate-800 text-white rounded-2xl px-4 py-3 text-[10px] focus:ring-2 focus:ring-brand-500/20 outline-none transition-all [color-scheme:dark]"
                                                     />
                                                 </div>
                                             </div>
@@ -1276,9 +1276,9 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
                                 <div className="flex flex-col space-y-4">
                                     <div className="flex flex-wrap items-center justify-between gap-3 p-4 border border-slate-800/50 bg-slate-900/30 rounded-2xl">
                                         <div className="flex items-center gap-2">
-                                            <input type="date" value={drawerHistoryFrom} onChange={e => setDrawerHistoryFrom(e.target.value)} className="bg-slate-900 border border-slate-800 text-white rounded-lg px-2 py-1.5 text-[10px] uppercase outline-none w-28" />
+                                            <input type="date" value={drawerHistoryFrom} onChange={e => setDrawerHistoryFrom(e.target.value)} className="bg-slate-900 border border-slate-800 text-white rounded-lg px-2 py-1.5 text-[10px] uppercase outline-none w-28 [color-scheme:dark]" />
                                             <span className="text-slate-500 font-bold">-</span>
-                                            <input type="date" value={drawerHistoryTo} onChange={e => setDrawerHistoryTo(e.target.value)} className="bg-slate-900 border border-slate-800 text-white rounded-lg px-2 py-1.5 text-[10px] uppercase outline-none w-28" />
+                                            <input type="date" value={drawerHistoryTo} onChange={e => setDrawerHistoryTo(e.target.value)} className="bg-slate-900 border border-slate-800 text-white rounded-lg px-2 py-1.5 text-[10px] uppercase outline-none w-28 [color-scheme:dark]" />
                                         </div>
                                         {(drawerHistoryFrom || drawerHistoryTo) && (
                                             <button onClick={() => { setDrawerHistoryFrom(''); setDrawerHistoryTo(''); }} className="text-[10px] font-bold text-rose-400 hover:text-rose-300 uppercase tracking-widest px-3 py-1.5 border border-rose-500/20 rounded-lg bg-rose-500/5 transition-all">Clear</button>
@@ -1378,7 +1378,7 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
                                                         type="month"
                                                         value={penaltyMonth}
                                                         onChange={e => setPenaltyMonth(e.target.value)}
-                                                        className="bg-slate-900 border border-slate-800 text-white rounded-lg px-3 py-2 text-xs font-black uppercase outline-none w-full"
+                                                        className="bg-slate-900 border border-slate-800 text-white rounded-lg px-3 py-2 text-xs font-black uppercase outline-none w-full [color-scheme:dark]"
                                                     />
                                                 </div>
 
