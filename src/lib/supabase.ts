@@ -2946,6 +2946,45 @@ export async function revokeLeave(requestId: string, adminId?: string) {
     return true;
 }
 
+export async function fetchLeaveMonthlyTracking(staffId: string, year: number, month: number) {
+    return withRetry(async () => {
+        const { data, error } = await supabase
+            .from('leave_monthly_tracking')
+            .select('year, month, paid_used')
+            .eq('staff_id', staffId)
+            .eq('year', year)
+            .eq('month', month)
+            .maybeSingle();
+        if (error) throw error;
+        return data;
+    });
+}
+
+export async function fetchLeaveDays(staffId: string, monthStr: string) {
+    return withRetry(async () => {
+        const { data, error } = await supabase
+            .from('leave_days')
+            .select('*')
+            .eq('staff_id', staffId)
+            .ilike('leave_date', `${monthStr}%`)
+            .order('leave_date', { ascending: true });
+        if (error) throw error;
+        return data;
+    });
+}
+
+export async function createApprovalRequest(request: any) {
+    return withRetry(async () => {
+        const { data, error } = await supabase
+            .from('approval_requests')
+            .insert(request)
+            .select()
+            .single();
+        if (error) throw error;
+        return data;
+    });
+}
+
 // ================================================================
 // RELIEVING & EXIT MANAGEMENT
 // ================================================================
