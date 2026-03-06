@@ -1228,20 +1228,20 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
 
             {/* Balance Detail Drawer */}
             {selectedBalance && (
-                <div className="fixed inset-0 z-[150] md:max-w-md md:mx-auto bg-[#0f172a] flex flex-col animate-in slide-in-from-bottom-4 duration-300">
-                    <div className="flex-shrink-0 px-6 py-5 border-b border-slate-800/50 flex items-center justify-between sticky top-0 bg-[#0f172a] shadow-sm z-10">
-                        <div>
-                            <h2 className="text-lg font-black text-white uppercase tracking-widest">Balance Details</h2>
-                            <p className="text-[9px] font-black text-brand-500 uppercase tracking-widest mt-1">Year {selectedBalance.year}</p>
+                <div className="fixed inset-0 z-[150] md:max-w-md md:mx-auto bg-[#0f172a] flex flex-col animate-in slide-in-from-bottom-4 duration-300 overflow-hidden w-full max-w-[100vw]">
+                    <div className="flex-shrink-0 px-6 pt-5 pb-4 border-b border-slate-800/50 sticky top-0 bg-[#0f172a] z-10 flex flex-col gap-5 w-full">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h2 className="text-lg font-black text-white uppercase tracking-widest">Balance Details</h2>
+                                <p className="text-[9px] font-black text-brand-500 uppercase tracking-widest mt-1">Year {selectedBalance.year}</p>
+                            </div>
+                            <button onClick={() => setSelectedBalance(null)} className="p-2 -mr-2 bg-slate-800/50 rounded-xl text-slate-500 hover:text-white transition-colors">
+                                <X size={20} />
+                            </button>
                         </div>
-                        <button onClick={() => setSelectedBalance(null)} className="p-2 -mr-2 bg-slate-800/50 rounded-xl text-slate-500 hover:text-white transition-colors">
-                            <X size={20} />
-                        </button>
-                    </div>
 
-                    <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-6 pb-32">
                         {/* Balance Strip */}
-                        <div className="grid grid-cols-2 gap-3 mb-6">
+                        <div className="grid grid-cols-2 gap-3">
                             <div className="p-4 bg-slate-900/50 rounded-3xl border border-slate-800">
                                 <p className="text-[8px] font-black text-slate-500 uppercase mb-1">Paid Rem.</p>
                                 <p className="text-xl font-black text-emerald-500">{selectedBalance.paid_balance}</p>
@@ -1251,6 +1251,9 @@ export default function StaffLeave({ staff }: StaffLeaveProps) {
                                 <p className="text-xl font-black text-amber-500">{selectedBalance.unpaid_balance || 0}</p>
                             </div>
                         </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar px-6 py-6 pb-32 w-full">
 
                         {/* Drawer Tabs */}
                         <div className="flex bg-slate-900/50 p-1.5 rounded-2xl border border-slate-800 mb-6 flex-shrink-0">
