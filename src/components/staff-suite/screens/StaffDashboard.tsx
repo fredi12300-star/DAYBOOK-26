@@ -18,13 +18,18 @@ interface StaffDashboardProps {
 export default function StaffDashboard({
     staff,
     todayAttendance,
-    leaveBalance: _leaveBalance,
+    leaveBalance,
     onNavigate
 }: StaffDashboardProps) {
     const formatTime = (isoString: string | null) => {
         if (!isoString) return '--:--';
         return new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
+
+    // Use actual paid balance if available, default to 0
+    const paidBalance = leaveBalance?.[0]?.paid_balance || 0;
+    const totalAllocated = 12; // Standard yearly allocation for progress bar fallback
+    const progress = Math.min(100, (paidBalance / totalAllocated) * 100);
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -78,14 +83,17 @@ export default function StaffDashboard({
                 </div>
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                        <span className="text-slate-400 text-xs font-bold">Annual Leaves</span>
+                        <span className="text-slate-400 text-xs font-bold">Annual Paid Leave</span>
                         <div className="flex items-baseline gap-1">
-                            <span className="text-lg font-black text-white">12</span>
+                            <span className="text-lg font-black text-white">{paidBalance}</span>
                             <span className="text-[10px] text-slate-500 uppercase">days</span>
                         </div>
                     </div>
                     <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                        <div className="h-full bg-brand-500 w-[60%] rounded-full shadow-glow shadow-brand-500/30" />
+                        <div
+                            className="h-full bg-brand-500 rounded-full shadow-glow shadow-brand-500/30 transition-all duration-1000"
+                            style={{ width: `${progress}%` }}
+                        />
                     </div>
                 </div>
             </div>
